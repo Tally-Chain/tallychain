@@ -3,7 +3,7 @@
 **Both halves match.** A proof-of-work chain where a payment is a receipt. The payer and the payee read the same words, amount and notch from the block.
 
 - Site: https://tallychain.org
-- Source: https://github.com/Tally-Chain/tally
+- Source: https://github.com/Tally-Chain/tallychain
 - Testnet, explorer and wallet: run `npm start` and open http://localhost:8344
 - Whitepaper: [WHITEPAPER.md](WHITEPAPER.md)
 - tTALLY is the testnet coin and has no market value
