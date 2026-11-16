@@ -9,9 +9,12 @@
   <meta property="og:description" content="A payment is a receipt. The words, the amount and the notch are cut once. Both sides read the same mark.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://tallychain.org/">
-  <meta property="og:image" content="https://tallychain.org/og.png">
+  <meta property="og:image" content="https://tallychain.org/og-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://tallychain.org/og.png">
+  <meta name="twitter:site" content="@tallyonrobin">
+  <meta name="twitter:image" content="https://tallychain.org/og-card.png">
   <link rel="canonical" href="https://tallychain.org/">
   <link rel="icon" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,7 +36,7 @@
           <span>Avg <b id="rail-time">20s</b></span>
         </div>
         <div class="netbar-right">
-          <span>tTALLY has no market value</span>
+          <span>$TALLY CA: <a href="/#token" style="color:var(--copper2)">0x7e27…02fb</a></span>
           <a href="https://github.com/Tally-Chain/tallychain">Tally-Chain/tallychain</a>
           <a href="https://x.com/tallyonrobin">@tallyonrobin</a>
         </div>
@@ -290,12 +293,17 @@
             </div>
           </div>
           <div class="asset-col">
-            <span class="cap">Robinhood Chain · Chain ID 4663</span>
+            <span class="cap">Robinhood Chain · Live now</span>
             <h4>$TALLY</h4>
-            <p>The separate token on Robinhood Chain that funds engineering on the path to Tally mainnet. Any contract circulating before official publication is counterfeit.</p>
+            <p>The separate token on Robinhood Chain (Chain ID 4663) that funds engineering on the path to Tally mainnet.</p>
             <div class="preview-notch" style="margin:14px 0 0">
               <span>Official contract address (CA)</span>
-              <code id="token-ca">Pending launch — published here &amp; on <a href="https://x.com/tallyonrobin" style="color:var(--copper2);text-decoration:underline">@tallyonrobin</a></code>
+              <code id="token-ca" style="color:var(--ink)">0x7e270fbd339c5b6cbddb8db6821ec94184f902fb</code>
+              <div class="row" style="margin-top:10px">
+                <button class="btn sm copper" type="button" onclick="navigator.clipboard.writeText('0x7e270fbd339c5b6cbddb8db6821ec94184f902fb').then(()=>{this.textContent='Copied CA';setTimeout(()=>{this.textContent='Copy CA'},1800)})">Copy CA</button>
+                <a class="btn sm" href="https://ponsfamily.com/launchpad/0x7e270fbd339c5b6cbddb8db6821ec94184f902fb" target="_blank" rel="noopener">Pons →</a>
+                <a class="btn sm" href="https://robinhoodchain.blockscout.com/token/0x7e270fbd339c5b6cbddb8db6821ec94184f902fb" target="_blank" rel="noopener">Blockscout →</a>
+              </div>
             </div>
           </div>
         </div>
@@ -313,7 +321,7 @@
         <div class="faq">
           <details open>
             <summary>Is tTALLY the same asset as $TALLY?</summary>
-            <p>No. <code>tTALLY</code> is strictly the testnet coin mined and dripped on this network; it carries zero monetary value. <code>$TALLY</code> is the Robinhood Chain token that backs development toward mainnet, and its contract address is published only at launch.</p>
+            <p>No. <code>tTALLY</code> is strictly the testnet coin mined and dripped on this network; it carries zero monetary value. <code>$TALLY</code> is the Robinhood Chain token (<code>0x7e270fbd339c5b6cbddb8db6821ec94184f902fb</code>) that backs development toward mainnet.</p>
           </details>
           <details>
             <summary>Where is my private key stored?</summary>

@@ -1,18 +1,77 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+      <path d="M 60 0 L 0 0 0 60" fill="none" stroke="#f3ece0" stroke-opacity=".035" stroke-width="1"/>
+    </pattern>
+  </defs>
   <rect width="1200" height="630" fill="#100e0c"/>
-  <rect x="44" y="44" width="1112" height="542" fill="#15120f" stroke="#f3ece0" stroke-opacity=".14"/>
-  <line x1="44" y1="118" x2="1156" y2="118" stroke="#f3ece0" stroke-opacity=".12"/>
-  <line x1="364" y1="118" x2="364" y2="586" stroke="#f3ece0" stroke-opacity=".12"/>
-  <text x="76" y="90" font-family="Consolas, monospace" font-size="17" letter-spacing="3" fill="#f0c399">TALLY CHAIN · PUBLIC RECEIPT LEDGER</text>
-  <text x="1124" y="90" text-anchor="end" font-family="Consolas, monospace" font-size="17" fill="#7b7166">tallychain.org</text>
-  <g transform="translate(96 226) scale(3.4)">
+  <rect width="1200" height="630" fill="url(#grid)"/>
+
+  <rect x="44" y="44" width="1112" height="542" fill="#15120f" stroke="#f3ece0" stroke-opacity=".16"/>
+  <line x1="44" y1="112" x2="1156" y2="112" stroke="#f3ece0" stroke-opacity=".13"/>
+  <line x1="44" y1="520" x2="1156" y2="520" stroke="#f3ece0" stroke-opacity=".13"/>
+  <line x1="654" y1="112" x2="654" y2="520" stroke="#f3ece0" stroke-opacity=".13"/>
+
+  <!-- Top bar -->
+  <circle cx="78" cy="78" r="4.5" fill="#b8d897"/>
+  <text x="94" y="83" font-family="Consolas, Courier New, monospace" font-size="15" letter-spacing="2.5" fill="#f0c399">TALLY CHAIN · PUBLIC RECEIPT LEDGER</text>
+  <text x="1124" y="83" text-anchor="end" font-family="Consolas, Courier New, monospace" font-size="15" letter-spacing="1.5" fill="#7b7166">tallychain.org</text>
+
+  <!-- Left column: New Matched-Halves Logo + Brand Headline -->
+  <g transform="translate(84 152) scale(1.65)">
     <rect width="64" height="64" rx="10" fill="#100e0c"/>
-    <rect x="1.25" y="1.25" width="61.5" height="61.5" rx="8.75" fill="none" stroke="#f3ece0" stroke-opacity=".18"/>
+    <rect x="1.25" y="1.25" width="61.5" height="61.5" rx="8.75" fill="none" stroke="#f3ece0" stroke-opacity=".2"/>
     <path d="M10 13H30.5V29.5L34.5 33.5L30.5 37.5V51H24V24.5H10Z" fill="#f3ece0"/>
     <path d="M33.5 13H54V24.5H40V51H33.5V37.5L37.5 33.5L33.5 29.5Z" fill="#e58333"/>
   </g>
-  <text x="420" y="278" font-family="Georgia, Times New Roman, serif" font-size="88" fill="#f3ece0" letter-spacing="-2">Both halves</text>
-  <text x="420" y="372" font-family="Georgia, Times New Roman, serif" font-style="italic" font-size="88" fill="#f0c399" letter-spacing="-1">match.</text>
-  <text x="420" y="452" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#b4a898">Every payment signs the words, the amount, and the SHA-256 notch.</text>
-  <text x="420" y="528" font-family="Consolas, monospace" font-size="18" letter-spacing="2" fill="#7b7166">ED25519 · SHA-256 POW · CLIENT-VERIFIED</text>
+  <text x="212" y="222" font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="62" fill="#f3ece0" letter-spacing="-2">tally</text>
+
+  <text x="84" y="344" font-family="Georgia, Times New Roman, serif" font-size="76" fill="#f3ece0" letter-spacing="-2">Both halves</text>
+  <text x="84" y="424" font-family="Georgia, Times New Roman, serif" font-style="italic" font-size="78" fill="#f0c399" letter-spacing="-1">match.</text>
+  <text x="84" y="482" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#b4a898">A chat can be cropped. A block cannot.</text>
+
+  <!-- Right column: Split Receipt Voucher Specimen -->
+  <g transform="translate(688 144)">
+    <rect width="434" height="344" rx="4" fill="#0b0a08" stroke="#f3ece0" stroke-opacity=".22"/>
+    <rect width="434" height="34" rx="4" fill="#181410"/>
+    <line x1="0" y1="34" x2="434" y2="34" stroke="#f3ece0" stroke-opacity=".13"/>
+    <text x="16" y="22" font-family="Consolas, Courier New, monospace" font-size="11.5" letter-spacing="1.5" fill="#b4a898">TALLY.TX.V1 · BLOCK #458</text>
+    <text x="418" y="22" text-anchor="end" font-family="Consolas, Courier New, monospace" font-size="11.5" fill="#f0c399">CUT ONCE</text>
+
+    <!-- Stock -->
+    <text x="18" y="64" font-family="Consolas, Courier New, monospace" font-size="11" letter-spacing="1.8" fill="#f0c399">STOCK · PAYER</text>
+    <text x="18" y="114" font-family="Georgia, Times New Roman, serif" font-size="40" fill="#f3ece0">1.25</text>
+    <text x="104" y="112" font-family="Consolas, Courier New, monospace" font-size="12" fill="#7b7166">tTALLY</text>
+    <rect x="18" y="132" width="174" height="34" fill="#15120f"/>
+    <line x1="18" y1="132" x2="18" y2="166" stroke="#e58333" stroke-width="2.5"/>
+    <text x="28" y="154" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#f3ece0">for the field report</text>
+    <text x="18" y="198" font-family="Consolas, Courier New, monospace" font-size="11" fill="#7b7166">ed25519 · client</text>
+    <text x="18" y="220" font-family="Consolas, Courier New, monospace" font-size="11" fill="#7b7166">fee 0.01 tTALLY</text>
+
+    <!-- Seam -->
+    <rect x="206" y="34" width="22" height="244" fill="#15120f"/>
+    <line x1="206" y1="34" x2="206" y2="278" stroke="#e58333" stroke-opacity=".3" stroke-dasharray="4 4"/>
+    <line x1="228" y1="34" x2="228" y2="278" stroke="#e58333" stroke-opacity=".3" stroke-dasharray="4 4"/>
+    <path d="M217 34 L217 74 L209 94 L225 118 L210 144 L224 170 L209 196 L225 222 L217 244 L217 278" fill="none" stroke="#e58333" stroke-width="1.8"/>
+
+    <!-- Foil -->
+    <text x="244" y="64" font-family="Consolas, Courier New, monospace" font-size="11" letter-spacing="1.8" fill="#f0c399">FOIL · PAYEE</text>
+    <text x="244" y="114" font-family="Georgia, Times New Roman, serif" font-size="40" fill="#f3ece0">1.25</text>
+    <text x="330" y="112" font-family="Consolas, Courier New, monospace" font-size="12" fill="#7b7166">tTALLY</text>
+    <rect x="244" y="132" width="172" height="34" fill="#15120f"/>
+    <line x1="244" y1="132" x2="244" y2="166" stroke="#e58333" stroke-width="2.5"/>
+    <text x="254" y="154" font-family="Segoe UI, Arial, sans-serif" font-size="14" fill="#f3ece0">for the field report</text>
+    <text x="244" y="198" font-family="Consolas, Courier New, monospace" font-size="11" fill="#7b7166">SHA-256(memo)</text>
+    <text x="244" y="220" font-family="Consolas, Courier New, monospace" font-size="11" fill="#7b7166">8d15194e…8a2e36</text>
+
+    <!-- Verified footer -->
+    <line x1="0" y1="278" x2="434" y2="278" stroke="#f3ece0" stroke-opacity=".13"/>
+    <rect x="14" y="292" width="406" height="36" rx="3" fill="#b8d897" fill-opacity=".1" stroke="#b8d897" stroke-opacity=".38"/>
+    <text x="28" y="315" font-family="Consolas, Courier New, monospace" font-size="12" letter-spacing="1.2" fill="#b8d897">● BOTH HALVES MATCH</text>
+    <text x="406" y="315" text-anchor="end" font-family="Consolas, Courier New, monospace" font-size="11" fill="#b4a898">VERIFIED IN BROWSER</text>
+  </g>
+
+  <!-- Bottom bar -->
+  <text x="78" y="560" font-family="Consolas, Courier New, monospace" font-size="15" letter-spacing="2" fill="#7b7166">WALLET · EXPLORER · OPEN SHA-256 MINING</text>
+  <text x="1124" y="560" text-anchor="end" font-family="Consolas, Courier New, monospace" font-size="15" letter-spacing="1.5" fill="#b4a898">@tallyonrobin</text>
 </svg>

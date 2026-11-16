@@ -7,7 +7,7 @@
 - Source: https://github.com/Tally-Chain/tallychain
 - Whitepaper: [WHITEPAPER.md](WHITEPAPER.md)
 - `tTALLY` is the testnet coin and has no market value
-- `$TALLY` on Robinhood Chain carries the project to mainnet. The contract is published at token launch by [@tallyonrobin](https://x.com/tallyonrobin)
+- `$TALLY` (Robinhood Chain, ID 4663): [`0x7e270fbd339c5b6cbddb8db6821ec94184f902fb`](https://robinhoodchain.blockscout.com/token/0x7e270fbd339c5b6cbddb8db6821ec94184f902fb) on [Pons](https://ponsfamily.com/launchpad/0x7e270fbd339c5b6cbddb8db6821ec94184f902fb) — funds the path to mainnet
 
 ## Mine on the public testnet
 

@@ -16,7 +16,7 @@ The receipt is the transaction. The words are one line, up to 140 bytes. The not
 
 One 32-byte seed, ed25519, address prefix `tally1`. SHA-256 proof of work, retargeted every block toward 20 seconds. Reward 8 tTALLY plus fees, spendable after 3 further blocks. Faucet 25 tTALLY once an hour per address. No premine and no treasury key.
 
-tTALLY has no market value. $TALLY on Robinhood Chain is a separate token that carries development to mainnet. Its contract is published at token launch.
+tTALLY has no market value. $TALLY on Robinhood Chain (`0x7e270fbd339c5b6cbddb8db6821ec94184f902fb`) is a separate token that carries development to mainnet.
 
 The testnet hash is SHA-256 so a browser and the node run the same function. The receipt rules do not depend on the hash.
 
