@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tally Chain · Both halves match</title>
-  <meta name="description" content="Tally is a proof-of-work chain where every payment is a receipt. Payer and payee read the same notch from the block.">
+  <meta name="description" content="Tally is a proof-of-work chain where every payment is a receipt. Payer and payee read the same SHA-256 notch and ed25519 signature from the block.">
   <meta property="og:title" content="Tally Chain · Both halves match">
   <meta property="og:description" content="A payment is a receipt. The words, the amount and the notch are cut once. Both sides read the same mark.">
   <meta property="og:type" content="website">
@@ -16,148 +16,454 @@
   <link rel="icon" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,560;1,9..144,520&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,480..560;1,9..144,480..520&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/style.css">
+  <script type="importmap">
+  { "imports": { "@noble/hashes/": "/vendor/hashes/", "@noble/curves/": "/vendor/curves/" } }
+  </script>
 </head>
 <body>
-  <header class="nav">
-    <a class="logo" href="/"><img src="/mark.svg" width="36" height="36" alt=""> tally</a>
-    <nav>
-      <a class="on" href="/">Home</a>
-      <a href="/explorer">Explorer</a>
-      <a href="/wallet">Wallet</a>
-      <a href="/mine">Mine</a>
-      <a href="/docs">Docs</a>
-      <a href="/whitepaper">Whitepaper</a>
-    </nav>
-    <a class="btn solid desk" href="/wallet">Open wallet</a>
-    <button class="burger" type="button">Menu</button>
-  </header>
-  <main class="wrap">
-    <section class="hero">
-      <p class="cap">A receipt chain · public testnet</p>
-      <h1>Both halves<br><em>match.</em></h1>
-      <p class="lede">Tally is a proof-of-work chain where a payment is a receipt. The words, the amount and the notch are cut once. The payer and the payee read that same mark back from the block. A chat can be cropped. A block cannot.</p>
-      <div class="row">
-        <a class="btn solid" href="/wallet">Open wallet</a>
-        <a class="btn" href="/explorer">Explorer</a>
-        <a class="btn" href="/mine">Start mining</a>
-      </div>
-      <a class="live" href="/explorer">Live testnet · block <b id="height">…</b></a>
-      <div class="specimen" aria-label="A receipt shown to both sides">
-        <div class="half">
-          <span class="cap">Payer</span>
-          <strong>2.00</strong>
-          <p>for the field report</p>
-          <code>notch of those words, signed by the payer</code>
+  <div class="site-top">
+    <div class="netbar">
+      <div class="netbar-in">
+        <div class="netbar-left">
+          <span><i class="dot"></i>Public testnet · SHA-256</span>
+          <span>Block <b id="rail-height">…</b></span>
+          <span>Diff <b id="rail-diff">…</b></span>
+          <span>Avg <b id="rail-time">20s</b></span>
         </div>
-        <div class="cut" aria-hidden="true"></div>
-        <div class="half">
-          <span class="cap">Payee</span>
-          <strong>2.00</strong>
-          <p>for the field report</p>
-          <code>the same notch, read from the same block</code>
+        <div class="netbar-right">
+          <span>tTALLY has no market value</span>
+          <a href="https://github.com/Tally-Chain/tallychain">Tally-Chain/tallychain</a>
+          <a href="https://x.com/tallyonrobin">@tallyonrobin</a>
         </div>
       </div>
-    </section>
+    </div>
+    <header class="nav">
+      <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+      <nav>
+        <a class="on" href="/">Home</a>
+        <a href="/explorer">Explorer</a>
+        <a href="/wallet">Wallet</a>
+        <a href="/mine">Mine</a>
+        <a href="/docs">Docs</a>
+        <a href="/whitepaper">Whitepaper</a>
+      </nav>
+      <div class="nav-actions desk">
+        <a class="btn sm" href="https://x.com/tallyonrobin" target="_blank" rel="noopener">X · @tallyonrobin</a>
+        <a class="btn sm" href="https://github.com/Tally-Chain/tallychain" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn solid sm" href="/wallet">Open wallet</a>
+      </div>
+      <button class="burger" type="button">Menu</button>
+    </header>
+  </div>
 
-    <section class="section" id="how">
-      <h2>Cut once.</h2>
-      <p class="sub">Three steps. After the block, neither side has a private copy to edit.</p>
-      <div class="steps">
-        <article>
-          <b>01</b>
-          <h3>Write</h3>
-          <p>The payer writes who is paid, how much, and what it was for. One line, up to 140 bytes. An optional mark is the hash of a file or a post.</p>
-        </article>
-        <article>
-          <b>02</b>
-          <h3>Sign</h3>
-          <p>The wallet signs those bytes with a key that never leaves the browser. The notch is SHA-256 of the words. Change a letter and the signature dies.</p>
-        </article>
-        <article>
-          <b>03</b>
-          <h3>Notch</h3>
-          <p>A miner cuts the receipt into a block. The payee opens the same transaction and hashes the words again. The two halves match, or the receipt is false.</p>
-        </article>
+  <main>
+    <section class="hero-band">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <div>
+            <p class="cap">Proof-of-work receipt ledger · tally.tx.v1</p>
+            <h1>Both halves<br><em>match.</em></h1>
+            <p class="lede">A transfer on an ordinary chain records that coins moved, not what they paid for. Tally cuts the payer, the payee, the amount and the words into one signed record. A chat can be cropped. A block cannot.</p>
+            <div class="row">
+              <a class="btn solid" href="/wallet">Open browser wallet</a>
+              <a class="btn" href="/explorer">Inspect ledger</a>
+              <a class="btn" href="/mine">Mine a block</a>
+            </div>
+          </div>
+          <div class="hero-notes">
+            <div><span>Signature</span><b>ed25519 · client-side</b></div>
+            <div><span>Notch</span><b>SHA-256(memo)</b></div>
+            <div><span>Target cadence</span><b>20s PoW retarget</b></div>
+          </div>
+        </div>
+
+        <div class="hero-proof">
+          <div class="voucher" aria-label="Live cryptographic receipt inspector">
+            <div class="voucher-bar">
+              <span id="v-source">Receipt specimen · verified in browser</span>
+              <a id="v-link" href="/explorer">Open in explorer →</a>
+            </div>
+            <div class="specimen">
+              <div class="half">
+                <div class="half-head">
+                  <span class="half-role">Stock · Payer</span>
+                  <span class="half-tag">ed25519 signed</span>
+                </div>
+                <strong id="v-amt-a">1.25<small>tTALLY</small></strong>
+                <p class="half-memo" id="v-memo-a">for the field report</p>
+                <div class="half-meta">
+                  <div><b>from</b> <span id="v-from">tally1…</span></div>
+                  <div><b>fee</b> <span id="v-fee">0.01 tTALLY</span></div>
+                </div>
+              </div>
+              <div class="cut" id="v-seam" aria-hidden="true"></div>
+              <div class="half">
+                <div class="half-head">
+                  <span class="half-role">Foil · Payee</span>
+                  <span class="half-tag" id="v-block-tag">on-chain</span>
+                </div>
+                <strong id="v-amt-b">1.25<small>tTALLY</small></strong>
+                <p class="half-memo" id="v-memo-b">for the field report</p>
+                <div class="half-meta">
+                  <div><b>to</b> <span id="v-to">tally1…</span></div>
+                  <div><b>mark</b> <span id="v-mark">—</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="tamper">
+              <div class="tamper-head">
+                <span>Test the notch · alter any character below</span>
+                <button class="btn sm" id="v-reset" type="button" hidden>Reset bytes</button>
+              </div>
+              <div class="tamper-row">
+                <input id="v-input" maxlength="140" value="for the field report" aria-label="Edit memo words to test SHA-256 notch verification" spellcheck="false">
+              </div>
+              <div class="notch-cmp">
+                <div class="notch-line"><span>Block notch</span><code id="v-notch-orig">…</code></div>
+                <div class="notch-line"><span>Recomputed</span><code id="v-notch-live">…</code></div>
+              </div>
+              <div class="match" id="v-status">
+                <strong id="v-verdict">Both halves match</strong>
+                <span id="v-detail">SHA-256 &amp; ed25519 verified locally</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section">
-      <h2>What the block holds.</h2>
-      <div class="cards">
-        <article><div class="k">Words</div><h3>The line you can read</h3><p>What the payment was for. Both wallets show it. The chain rejects a line break, so the receipt cannot hide a second version.</p></article>
-        <article><div class="k">Notch</div><h3>Hash of those words</h3><p>Anyone can recompute it. The explorer does it in your browser and checks the signature against the payer’s address.</p></article>
-        <article><div class="k">Mark</div><h3>Optional hash of the work</h3><p>A 32-byte hash of the report, the post, or the file. The file stays off-chain. The mark is what both sides compare.</p></article>
-        <article><div class="k">Public</div><h3>A receipt is meant to be shown</h3><p>Amounts are visible. Hiding them would make the two halves impossible to hold up next to each other. That is the product.</p></article>
+    <section class="band" id="how">
+      <div class="wrap band-in">
+        <div class="sec-head">
+          <div class="sec-no">§ 01 · Protocol</div>
+          <div>
+            <h2>Cut once. Held by both.</h2>
+            <p class="sub">Historically, a tally stick was notched across the grain and split lengthwise so neither party could add a debt alone. Tally applies the same rule to signed bytes.</p>
+          </div>
+        </div>
+        <div class="steps">
+          <article>
+            <div class="step-k"><b>01 / Write</b><span>1–140 UTF-8 bytes</span></div>
+            <h3>State what the payment settles</h3>
+            <p>The payer enters the recipient, the amount, and one plain line of text. Line breaks are rejected at consensus so a receipt cannot tuck a second clause below the fold. An optional 32-byte mark commits to an off-chain file, deliverable, or post.</p>
+          </article>
+          <article>
+            <div class="step-k"><b>02 / Sign</b><span>ed25519 in browser</span></div>
+            <h3>Lock the canonical lines</h3>
+            <p>Your 32-byte seed stays in local storage and never touches the node. The browser hashes the memo into the notch and signs the eight canonical lines of <code>tally.tx.v1</code>. Altering one byte invalidates both the notch and the signature.</p>
+          </article>
+          <article>
+            <div class="step-k"><b>03 / Verify</b><span>SHA-256 PoW</span></div>
+            <h3>Read the same block back</h3>
+            <p>A miner commits the transaction root into a proof-of-work block. When the payee opens the transaction link—today or a year later—their browser recomputes <code>SHA-256(memo)</code> and verifies the payer’s public key directly from the <code>tally1</code> address.</p>
+          </article>
+        </div>
       </div>
     </section>
 
-    <section class="section" id="live">
-      <h2>On the testnet now.</h2>
-      <p class="sub">These numbers come from this node and move when a block lands.</p>
-      <div class="statgrid">
-        <div><span>Height</span><b id="s-height">…</b></div>
-        <div><span>Receipts</span><b id="s-receipts">…</b></div>
-        <div><span>Supply</span><b id="s-supply">…</b></div>
-        <div><span>Block time</span><b id="s-time">…</b></div>
+    <section class="band" id="wire">
+      <div class="wrap band-in">
+        <div class="sec-head">
+          <div class="sec-no">§ 02 · Wire format</div>
+          <div>
+            <h2>Eight lines, zero hidden state.</h2>
+            <p class="sub">Every wallet, explorer tab and CLI node hashes the exact same UTF-8 byte sequence from <code>client/protocol.js</code>.Amounts remain public by design: a receipt you cannot show to a third party is not a receipt.</p>
+          </div>
+        </div>
+        <div class="wire-grid">
+          <div class="wire-code">
+            <div>
+              <p class="cap">Canonical payload signed by ed25519</p>
+              <pre><code><span class="ln">1</span><span class="hl">tally.tx.v1</span>
+<span class="ln">2</span>pay
+<span class="ln">3</span>tally18x9d…payer_address
+<span class="ln">4</span>tally14m2k…payee_address
+<span class="ln">5</span>1250000
+<span class="ln">6</span>10000
+<span class="ln">7</span>0
+<span class="ln">8</span><span class="hl">for the field report</span>
+<span class="ln">9</span>8d15194e…optional_32_byte_mark_hex</code></pre>
+            </div>
+            <p class="muted" style="margin:0">Transaction ID: <code>SHA-256(canon + "\n" + sig_hex)</code>. Notch: <code>SHA-256(line 8)</code>.</p>
+          </div>
+          <div class="wire-fields">
+            <div class="wire-row">
+              <code>Memo ·Words</code>
+              <p><strong>1 to 140 UTF-8 bytes, single line.</strong> Stored verbatim in the block so both wallets render the exact sentence without an external database or indexer.</p>
+            </div>
+            <div class="wire-row">
+              <code>Notch</code>
+              <p><strong>SHA-256 digest of the memo.</strong> Recomputed client-side whenever a receipt is viewed. Proves the displayed words are byte-for-byte identical to what entered the block.</p>
+            </div>
+            <div class="wire-row">
+              <code>Mark · Ref</code>
+              <p><strong>Optional 64-hex digest.</strong> Hash a PDF invoice, archive, or repository commit locally in the wallet; the file stays private while its fingerprint is notarized in the payment.</p>
+            </div>
+            <div class="wire-row">
+              <code>Units &amp; Fee</code>
+              <p><strong>1 tTALLY = 1,000,000 notches.</strong> Minimum relay and block fee is <code>0.01 tTALLY</code>, paid directly to the miner who seals the block.</p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="section" id="roadmap">
-      <h2>From a receipt to a wage.</h2>
-      <ol class="road">
-        <li><span class="tag">Live</span><div><h3>Receipts</h3><p class="sub">Signed payments with words, a notch and an optional mark. Wallet, explorer, faucet and open mining.</p></div></li>
-        <li><span class="tag wait">Next</span><div><h3>Streams</h3><p class="sub">A wage that notches every few blocks. What is already earned stays with the payee when the stream stops.</p></div></li>
-        <li><span class="tag wait">Then</span><div><h3>Errands</h3><p class="sub">Coins locked to a job. The worker submits a mark, the payer releases them, or the deadline returns the coins.</p></div></li>
-        <li><span class="tag wait">After that</span><div><h3>Mainnet</h3><p class="sub">Genesis once streams and errands are specified and tested. $TALLY on Robinhood Chain carries the work there. tTALLY does not.</p></div></li>
-      </ol>
+    <section class="band" id="live">
+      <div class="wrap band-in">
+        <div class="sec-head">
+          <div class="sec-no">§ 03 · Live network</div>
+          <div>
+            <h2>On the public node right now.</h2>
+            <p class="sub">Real blocks and real ed25519-signed transactions served directly by this node—not mocked figures. Open any row in the explorer to verify its signature in your browser.</p>
+          </div>
+        </div>
+        <div class="statgrid six">
+          <div><span>Height</span><b id="s-height">…</b></div>
+          <div><span>Receipts</span><b id="s-receipts">…</b></div>
+          <div><span>Difficulty</span><b id="s-diff">…</b></div>
+          <div><span>Block time</span><b id="s-time">…</b></div>
+          <div><span>Supply</span><b id="s-supply">…</b></div>
+          <div><span>Reward</span><b>8 tTALLY</b></div>
+        </div>
+        <div class="split2" style="margin-top:18px">
+          <div class="panel">
+            <div class="panel-head">
+              <p class="cap">Recent blocks</p>
+              <a class="aux" href="/explorer">All blocks →</a>
+            </div>
+            <div class="list" id="home-blocks"><p class="muted">Loading blocks…</p></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <p class="cap">Recent signed receipts</p>
+              <a class="aux" href="/explorer">All receipts →</a>
+            </div>
+            <div class="list" id="home-receipts"><p class="muted">Loading receipts…</p></div>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <section class="section" id="faq">
-      <h2>Questions.</h2>
-      <div class="faq">
-        <details open>
-          <summary>Is tTALLY the same as $TALLY?</summary>
-          <p>No. tTALLY is the testnet coin. The faucet drips it and miners earn it. It has no market. $TALLY is the Robinhood Chain token that funds the path to mainnet. Its contract is published at launch.</p>
-        </details>
-        <details>
-          <summary>Where are my keys?</summary>
-          <p>In this browser. The wallet makes a 32-byte seed on your device and derives an ed25519 key from it. The node never sees the seed. The seed is the only way back in.</p>
-        </details>
-        <details>
-          <summary>What if the payee is offline?</summary>
-          <p>The receipt does not need them. It sits in the block. When they open it, their wallet hashes the same words and shows the same notch.</p>
-        </details>
-        <details>
-          <summary>Can I run a node?</summary>
-          <p>Yes. One Node.js program is the node, the explorer and the wallet. Clone the <a href="https://github.com/Tally-Chain/tallychain">repository</a>, install, and start. You hold the chain yourself.</p>
-        </details>
+    <section class="band" id="roadmap">
+      <div class="wrap band-in">
+        <div class="sec-head">
+          <div class="sec-no">§ 04 · Delivery</div>
+          <div>
+            <h2>From a single receipt to escrowed work.</h2>
+            <p class="sub">We ship only what runs in code today and name what comes next plainly.</p>
+          </div>
+        </div>
+        <ol class="road">
+          <li>
+            <span class="tag">● Live now</span>
+            <h3>Receipts</h3>
+            <p>Signed payments with a single-line memo, SHA-256 notch, and optional file mark. Browser wallet, local file hashing, block explorer, hourly faucet, Web Worker miner, and standalone CLI node/miner.</p>
+          </li>
+          <li>
+            <span class="tag wait">Phase II</span>
+            <h3>Streams</h3>
+            <p>Block-cadence wages. A payer funds a rate per N blocks; accrued notches belong to the payee immediately if the stream is halted.</p>
+          </li>
+          <li>
+            <span class="tag wait">Phase III</span>
+            <h3>Errands</h3>
+            <p>Mark-bound escrow. Coins lock against a job specification; the worker posts the deliverable’s SHA-256 mark, and the payer releases or the timeout refunds.</p>
+          </li>
+          <li>
+            <span class="tag wait">Phase IV</span>
+            <h3>Mainnet</h3>
+            <p>Genesis after Streams, Errands, and peer-to-peer sync are specified, tested, and reviewed. The canonical receipt format stays unchanged.</p>
+          </li>
+        </ol>
+
+        <div class="asset-box" aria-label="Distinction between tTALLY and $TALLY">
+          <div class="asset-col">
+            <span class="cap">Testnet unit · Live here</span>
+            <h4>tTALLY</h4>
+            <p>Mined on this SHA-256 testnet (8 tTALLY per block) and dripped by the protocol faucet (25 tTALLY/hour). <strong>tTALLY has no market value</strong> and does not convert into mainnet supply.</p>
+          </div>
+          <div class="asset-col">
+            <span class="cap">Robinhood Chain token · At launch</span>
+            <h4>$TALLY</h4>
+            <p>The separate token on Robinhood Chain that funds engineering on the path to Tally mainnet. No contract address is live before <a href="https://x.com/tallyonrobin" style="color:var(--copper2);text-decoration:underline">@tallyonrobin</a> publishes it.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="faq">
+      <div class="wrap band-in">
+        <div class="sec-head">
+          <div class="sec-no">§ 05 · Questions</div>
+          <div>
+            <h2>Straight answers.</h2>
+          </div>
+        </div>
+        <div class="faq">
+          <details open>
+            <summary>Is tTALLY the same asset as $TALLY?</summary>
+            <p>No. <code>tTALLY</code> is strictly the testnet coin mined and dripped on this network; it carries zero monetary value. <code>$TALLY</code> is the Robinhood Chain token that backs development toward mainnet, and its contract address is published only at launch.</p>
+          </details>
+          <details>
+            <summary>Where is my private key stored?</summary>
+            <p>Only in your browser’s <code>localStorage</code> as a 64-character hex seed. Signing uses <code>@noble/curves/ed25519</code> locally on your device. The server receives only the finished public transaction and never sees your seed.</p>
+          </details>
+          <details>
+            <summary>Can I mine against tallychain.org from a terminal instead of localhost?</summary>
+            <p>Yes. Clone <a href="https://github.com/Tally-Chain/tallychain">Tally-Chain/tallychain</a>, run <code>npm install</code>, and run <code>node miner/miner.js YOUR_TALLY1_ADDRESS</code>. It connects to <code>https://tallychain.org</code> by default, or takes <code>--node http://localhost:8344</code> if you run your own local node.</p>
+          </details>
+          <details>
+            <summary>What if the recipient is offline when I pay?</summary>
+            <p>They do not need to be online. Once a miner includes your signed receipt in a block, any browser opening that transaction ID recomputes the SHA-256 notch and verifies your signature from the block data.</p>
+          </details>
+        </div>
       </div>
     </section>
   </main>
+
   <footer class="foot">
-    <div>
-      <a class="logo" href="/"><img src="/mark.svg" width="36" height="36" alt=""> tally</a>
-      <p class="fine"><a href="https://tallychain.org">tallychain.org</a> · a public testnet. tTALLY has no market value. $TALLY on Robinhood Chain carries the project to mainnet.</p>
-    </div>
-    <div class="cols">
-      <div><a href="/whitepaper">Whitepaper</a><a href="/docs">Docs</a></div>
-      <div><a href="/explorer">Explorer</a><a href="/wallet">Wallet</a><a href="/mine">Mine</a></div>
-      <div><a href="/#how">How a receipt works</a><a href="/#roadmap">Roadmap</a><a href="/docs#api">API</a><a href="https://github.com/Tally-Chain/tallychain">GitHub</a></div>
+    <div class="foot-in">
+      <div>
+        <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+        <p class="fine"><a href="https://tallychain.org">tallychain.org</a> · public proof-of-work testnet. tTALLY has no market value. $TALLY on Robinhood Chain funds the path to mainnet.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <p class="col-h">Network</p>
+          <a href="/explorer">Explorer</a>
+          <a href="/wallet">Wallet</a>
+          <a href="/mine">Mine</a>
+        </div>
+        <div>
+          <p class="col-h">Specification</p>
+          <a href="/docs">Docs &amp; CLI</a>
+          <a href="/docs#api">JSON API</a>
+          <a href="/whitepaper">Whitepaper</a>
+        </div>
+        <div>
+          <p class="col-h">Source</p>
+          <a href="https://github.com/Tally-Chain/tallychain">GitHub</a>
+          <a href="https://x.com/tallyonrobin">X · @tallyonrobin</a>
+        </div>
+      </div>
     </div>
   </footer>
+
   <script src="/chrome.js"></script>
-  <script>
+  <script type="module">
+    import { $, TALLY_SEAM_SVG, ago, api, esc, formatTally, notchOf, short, tally, verifySig } from '/common.js';
+    import { addressFromSecret, seedBytes, signTx } from '/protocol.js';
+
+    $('v-seam').innerHTML = TALLY_SEAM_SVG;
+
+    // Fallback deterministic signed specimen until live chain receipt loads
+    const demoSecA = seedBytes('11'.repeat(32));
+    const demoSecB = seedBytes('22'.repeat(32));
+    let activeTx = signTx({
+      type: 'pay',
+      from: addressFromSecret(demoSecA),
+      to: addressFromSecret(demoSecB),
+      amount: '1250000',
+      fee: '10000',
+      nonce: 0,
+      memo: 'for the field report',
+      ref: '8d15194ea92c77105d7130e1c4b2390cf51d8384a2f7958b32b4f209c08a2e36',
+    }, demoSecA);
+    let isLiveTx = false;
+
+    function renderSpecimen() {
+      const amt = formatTally(activeTx.amount);
+      $('v-amt-a').innerHTML = `${esc(amt)}<small>tTALLY</small>`;
+      $('v-amt-b').innerHTML = `${esc(amt)}<small>tTALLY</small>`;
+      $('v-from').textContent = short(activeTx.from, 11);
+      $('v-to').textContent = short(activeTx.to, 11);
+      $('v-fee').textContent = tally(activeTx.fee || '0');
+      $('v-mark').textContent = activeTx.ref ? short(activeTx.ref, 10) : 'none';
+      $('v-notch-orig').textContent = activeTx.notch;
+      $('v-input').value = activeTx.memo;
+      if (isLiveTx) {
+        $('v-source').textContent = `Live chain receipt · block #${activeTx.height}`;
+        $('v-block-tag').textContent = `block #${activeTx.height}`;
+        $('v-link').href = `/explorer#/tx/${activeTx.id}`;
+        $('v-link').textContent = `Inspect tx ${short(activeTx.id, 6)} →`;
+      } else {
+        $('v-source').textContent = 'Signed receipt specimen · ed25519';
+        $('v-block-tag').textContent = 'verified specimen';
+        $('v-link').href = '/explorer';
+      }
+      evaluateTamper();
+    }
+
+    function evaluateTamper() {
+      const current = $('v-input').value;
+      $('v-memo-a').textContent = current || ' ';
+      $('v-memo-b').textContent = activeTx.memo;
+      const recomputed = notchOf(current);
+      $('v-notch-live').textContent = recomputed;
+      const candidate = { ...activeTx, memo: current };
+      const notchMatches = recomputed === activeTx.notch;
+      const sigMatches = activeTx.type === 'coinbase' ? notchMatches : verifySig(candidate);
+      const ok = notchMatches && sigMatches;
+      $('v-reset').hidden = current === activeTx.memo;
+      $('v-status').className = ok ? 'match' : 'match no';
+      $('v-verdict').textContent = ok ? 'Both halves match' : 'Mismatch · signature & notch rejected';
+      $('v-detail').textContent = ok
+        ? 'SHA-256(memo) and ed25519 signature verified in this browser'
+        : 'Payer words differ from the block — hash moved and ed25519 verify failed';
+    }
+
+    $('v-input').addEventListener('input', evaluateTamper);
+    $('v-reset').addEventListener('click', () => {
+      $('v-input').value = activeTx.memo;
+      evaluateTamper();
+    });
+
+    renderSpecimen();
+
     const fmt = (n) => Number(n).toLocaleString('en-US');
-    fetch('/api/stats').then((r) => r.json()).then((s) => {
-      const whole = (BigInt(s.supply) / 1000000n).toString();
-      document.getElementById('height').textContent = fmt(s.height);
-      document.getElementById('s-height').textContent = fmt(s.height);
-      document.getElementById('s-receipts').textContent = fmt(s.receipts);
-      document.getElementById('s-supply').textContent = fmt(whole);
-      document.getElementById('s-time').textContent = s.blockTime + 's';
-    }).catch(() => {});
+
+    async function loadLive() {
+      try {
+        const [s, blocks, receipts] = await Promise.all([
+          api('/api/stats'),
+          api('/api/blocks?limit=6'),
+          api('/api/receipts?limit=6'),
+        ]);
+        const whole = (BigInt(s.supply) / 1000000n).toString();
+        $('s-height').textContent = fmt(s.height);
+        $('s-receipts').textContent = fmt(s.receipts);
+        $('s-diff').textContent = fmt(s.difficulty);
+        $('s-time').textContent = s.blockTime + 's';
+        $('s-supply').textContent = fmt(whole) + ' tTALLY';
+
+        $('home-blocks').innerHTML = blocks.length
+          ? `<div class="list-head"><span>Block</span><span>Hash &amp; miner</span><span>Activity</span></div>` +
+            blocks.map((b) => `<a href="/explorer#/block/${b.height}"><span>#${b.height}</span><span>${esc(short(b.hash, 10))} · ${esc(short(b.miner, 7))}</span><span>${b.txs} tx · ${ago(b.time)}</span></a>`).join('')
+          : '<p class="muted">Waiting for the first block.</p>';
+
+        const pays = receipts.filter((tx) => tx.type === 'pay');
+        $('home-receipts').innerHTML = receipts.length
+          ? `<div class="list-head"><span>Type</span><span>Memo</span><span>Amount</span></div>` +
+            receipts.map((tx) => `<a href="/explorer#/tx/${tx.id}"><span class="pill ${tx.type === 'pay' ? 'pay' : ''}">${esc(tx.type)}</span><span class="memo-cell">${esc(tx.memo)}</span><span>${esc(tally(tx.amount))}</span></a>`).join('')
+          : '<p class="muted">No user receipts yet — open the wallet to cut the first one.</p>';
+
+        if (pays.length && !isLiveTx) {
+          const full = await api('/api/tx/' + pays[0].id);
+          if (full && full.sig) {
+            activeTx = full;
+            isLiveTx = true;
+            renderSpecimen();
+          }
+        }
+      } catch {
+        // Keep specimen interactive even if offline
+      }
+    }
+
+    loadLive();
+    setInterval(loadLive, 10000);
   </script>
 </body>
 </html>

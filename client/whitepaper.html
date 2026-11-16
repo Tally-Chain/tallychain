@@ -3,50 +3,131 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Whitepaper · Tally</title>
+  <title>Whitepaper · Tally Chain</title>
   <link rel="canonical" href="https://tallychain.org/whitepaper">
   <link rel="icon" href="/favicon.svg">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,480..560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header class="nav">
-    <a class="logo" href="/"><img src="/mark.svg" width="36" height="36" alt=""> tally</a>
-    <nav>
-      <a href="/">Home</a><a href="/explorer">Explorer</a><a href="/wallet">Wallet</a><a href="/mine">Mine</a><a href="/docs">Docs</a><a class="on" href="/whitepaper">Whitepaper</a>
-    </nav>
-    <a class="btn solid desk" href="/wallet">Open wallet</a>
-    <button class="burger" type="button">Menu</button>
-  </header>
-  <main class="wrap page prose">
-    <p class="cap">Version 0.1 · testnet · November 2026</p>
-    <h1>Both halves match.</h1>
-    <p>Tally Chain is a proof-of-work chain where a payment is a receipt. The payer, the payee, the amount, the words and an optional mark are signed and cut into a block. Both sides read that same receipt back. Neither side can change it after the block. The testnet is live. The rules on this page are the rules in the repository, and the test suite runs them.</p>
+  <div class="site-top">
+    <div class="netbar">
+      <div class="netbar-in">
+        <div class="netbar-left">
+          <span><i class="dot"></i>Public testnet · SHA-256</span>
+          <span>Block <b id="rail-height">…</b></span>
+          <span>Diff <b id="rail-diff">…</b></span>
+          <span>Avg <b id="rail-time">20s</b></span>
+        </div>
+        <div class="netbar-right">
+          <span>Whitepaper · v0.1</span>
+          <a href="https://github.com/Tally-Chain/tallychain">Tally-Chain/tallychain</a>
+          <a href="https://x.com/tallyonrobin">@tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+    <header class="nav">
+      <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/explorer">Explorer</a>
+        <a href="/wallet">Wallet</a>
+        <a href="/mine">Mine</a>
+        <a href="/docs">Docs</a>
+        <a class="on" href="/whitepaper">Whitepaper</a>
+      </nav>
+      <div class="nav-actions desk">
+        <a class="btn sm" href="https://x.com/tallyonrobin" target="_blank" rel="noopener">X · @tallyonrobin</a>
+        <a class="btn sm" href="https://github.com/Tally-Chain/tallychain" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn solid sm" href="/wallet">Open wallet</a>
+      </div>
+      <button class="burger" type="button">Menu</button>
+    </header>
+  </div>
 
-    <h2>1. The problem</h2>
-    <p>A transfer on a public chain says that value moved. It does not say what the value was for. That sentence lives in a chat, an invoice PDF, or a screenshot, and any of those can be cropped. Two people, or a person and an agent, cannot hold up the same record and know it is the one that was signed.</p>
+  <main class="wrap page">
+    <div class="pagehead">
+      <div>
+        <p class="cap">Version 0.1 · Public Testnet · November 2026</p>
+        <h1>Both halves match.</h1>
+      </div>
+      <a class="btn sm" href="/explorer">Inspect live chain →</a>
+    </div>
 
-    <h2>2. Design</h2>
-    <p>The receipt is the transaction. There is no second copy. The words are short enough to read in an explorer. The notch is the hash of those words, recomputed by whoever is looking. An optional mark commits to a larger file without putting the file on the chain. Amounts stay public, because a receipt you cannot show is not a receipt.</p>
+    <div class="doc-grid">
+      <aside class="toc">
+        <p class="cap">Sections</p>
+        <a href="#s1">1. The problem</a>
+        <a href="#s2">2. Design</a>
+        <a href="#s3">3. Keys</a>
+        <a href="#s4">4. Consensus</a>
+        <a href="#s5">5. Testnet supply &amp; $TALLY</a>
+        <a href="#s6">6. Next phases</a>
+        <a href="#s7">7. Non-claims</a>
+      </aside>
 
-    <h2>3. Keys</h2>
-    <p>One 32-byte seed. ed25519. The address is the public key with a checksum, prefixed <code>tally1</code>. The seed is created in the browser and is not sent to the node.</p>
+      <div class="prose">
+        <p><strong>Abstract.</strong> Tally Chain is a proof-of-work ledger in which a payment is a receipt. The payer, the payee, the amount, the plain-language reason for payment, and an optional 32-byte work hash are signed together and sealed into a block. Both parties read that identical record back and verify it locally in the browser. Neither party holds a mutable copy.</p>
 
-    <h2>4. Consensus</h2>
-    <p>SHA-256 proof of work. Difficulty retargets every block toward 20 seconds and moves at most 4× in a step. Block reward is 8 tTALLY plus fees. Coinbase spends after 3 further blocks. One Node.js process is the node, the wallet’s API and the explorer.</p>
-    <p>The testnet uses SHA-256 so a browser and the node run the same hash. If specialized hardware later crowds ordinary miners out, the hash can change without changing what a receipt is.</p>
+        <h2 id="s1">1. The problem</h2>
+        <p>A transfer on a general-purpose chain proves that units moved from address A to address B. It says nothing about what those units settled. In practice, the agreement lives inside a chat log, an email thread, or a screenshot—artifacts that are trivial to crop, edit, or lose. Two people, or a person and an autonomous software agent, cannot point to one self-contained cryptographic object that binds the money to the words.</p>
 
-    <h2>5. Supply on the testnet</h2>
-    <p>Coins come from block rewards and from the faucet, 25 tTALLY once an hour per address. There is no premine and no treasury key. tTALLY has no market value. $TALLY, the Robinhood Chain token, is a separate asset that carries development to mainnet. Its contract is published when that token launches.</p>
+        <h2 id="s2">2. Design</h2>
+        <p>In Tally, the receipt is the transaction itself. Every <code>pay</code> transaction carries a mandatory single-line memo (1 to 140 UTF-8 bytes, with line breaks forbidden at the protocol layer so a second line cannot be concealed). Its <strong>notch</strong> is <code>SHA-256(memo)</code>, recomputed client-side whenever the transaction is inspected. An optional 32-byte <strong>mark</strong> (<code>ref</code>) commits to an off-chain deliverable, PDF invoice, or repository state without bloating chain storage.</p>
+        <p>Amounts, senders, and recipients remain public by design. Obscuring the face of a voucher prevents the two halves from being held up side by side.</p>
 
-    <h2>6. What comes next</h2>
-    <p><strong>Streams.</strong> A wage that notches on a schedule. Coins already earned stay with the payee when the payer stops the stream.</p>
-    <p><strong>Errands.</strong> Coins locked to a described job. The worker submits a mark. The payer releases the coins, or a deadline returns them.</p>
-    <p><strong>Mainnet.</strong> Genesis after those two are specified, tested and reviewed. The receipt rule does not change.</p>
+        <h2 id="s3">3. Keys</h2>
+        <p>Each account is a 32-byte <code>ed25519</code> secret seed generated in the user’s browser. Addresses encode the 32-byte public key plus a 4-byte double-<code>SHA-256</code> checksum in Base58 with the human-readable prefix <code>tally1</code>. Because the public key is recoverable directly from the address, any client can verify a receipt signature with zero RPC trust.</p>
 
-    <h2>7. What this paper does not claim</h2>
-    <p>Tally does not hide amounts, senders or receivers. It does not replace a court. It does not make an off-chain file permanent; it makes the hash of that file permanent. A signature proves the payer agreed to the bytes in the block. It does not, by itself, prove the work was done. Errands are the phase that binds the coins to that question.</p>
+        <h2 id="s4">4. Consensus</h2>
+        <p>Blocks are sealed with <code>SHA-256</code> proof of work targeting 20-second intervals. Difficulty adjusts on every block and is clamped to a maximum 4× step in either direction. Miners collect 8 <code>tTALLY</code> plus transaction fees, maturing after 3 subsequent blocks.</p>
+        <p><code>SHA-256</code> is used on the public testnet so Web Workers in an ordinary browser and Node.js CLI miners execute the exact same primitive. If dedicated hardware later crowds out general-purpose miners, the header hash can transition to a memory-hard function without altering <code>tally.tx.v1</code> receipt semantics.</p>
+
+        <h2 id="s5">5. Supply on the testnet &amp; $TALLY</h2>
+        <p>Testnet coins (<code>tTALLY</code>) originate exclusively from block rewards and protocol-enforced faucet transactions (25 <code>tTALLY</code> per hour per address). There is no premine and no privileged treasury key. <strong><code>tTALLY</code> has no market value</strong> and will not carry balances into mainnet.</p>
+        <p><strong><code>$TALLY</code></strong> on Robinhood Chain is a separate token that funds engineering and audits on the road to Tally mainnet. Its contract address is published only when that token launches.</p>
+
+        <h2 id="s6">6. What comes next</h2>
+        <p><strong>Streams.</strong> Scheduled wages that notch every few blocks. Accrued balance vests immediately with the payee whenever a stream is stopped.</p>
+        <p><strong>Errands.</strong> Escrowed payments locked to a task specification. The worker submits the deliverable’s 32-byte mark; the payer releases the lock, or an expiry height returns the funds.</p>
+        <p><strong>Mainnet.</strong> Genesis once Streams, Errands, and multi-node peer replication are specified, tested, and reviewed.</p>
+
+        <h2 id="s7">7. What this paper does not claim</h2>
+        <p>Tally does not hide balances or counterparties. It does not store off-chain files or guarantee their availability; it notarizes their 32-byte SHA-256 fingerprint at the moment of payment. A valid signature proves the payer signed those exact bytes; binding release of funds to counterparty delivery belongs to the Errands escrow phase.</p>
+      </div>
+    </div>
   </main>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <div>
+        <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+        <p class="fine"><a href="https://tallychain.org">tallychain.org</a> · rules on this page match <code>client/protocol.js</code> and <code>server/chain.js</code>.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <p class="col-h">Network</p>
+          <a href="/explorer">Explorer</a>
+          <a href="/wallet">Wallet</a>
+          <a href="/mine">Mine</a>
+        </div>
+        <div>
+          <p class="col-h">Specification</p>
+          <a href="/docs">Docs &amp; CLI</a>
+          <a href="/docs#api">JSON API</a>
+          <a href="/whitepaper">Whitepaper</a>
+        </div>
+        <div>
+          <p class="col-h">Source</p>
+          <a href="https://github.com/Tally-Chain/tallychain">GitHub</a>
+          <a href="https://x.com/tallyonrobin">X · @tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script src="/chrome.js"></script>
 </body>
 </html>

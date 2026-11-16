@@ -2,11 +2,11 @@ import { belowTarget, powHash } from '../client/protocol.js';
 
 const address = process.argv[2];
 if (!address || address.startsWith('--')) {
-  console.log('usage: node miner/miner.js tally1... [--node http://localhost:8344]');
+  console.log('usage: node miner/miner.js tally1... [--node https://tallychain.org]');
   process.exit(1);
 }
 const nodeFlag = process.argv.indexOf('--node');
-const node = (nodeFlag === -1 ? 'http://127.0.0.1:8344' : process.argv[nodeFlag + 1]).replace(/\/$/, '');
+const node = (nodeFlag === -1 ? 'https://tallychain.org' : process.argv[nodeFlag + 1]).replace(/\/$/, '');
 
 let found = 0;
 console.log(`mining for ${address}\nnode ${node}`);

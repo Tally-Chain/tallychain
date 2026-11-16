@@ -3,80 +3,184 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Wallet · Tally</title>
+  <title>Wallet · Tally Chain</title>
   <link rel="canonical" href="https://tallychain.org/wallet">
   <link rel="icon" href="/favicon.svg">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,480..560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/style.css">
   <script type="importmap">
   { "imports": { "@noble/hashes/": "/vendor/hashes/", "@noble/curves/": "/vendor/curves/" } }
   </script>
 </head>
 <body>
-  <header class="nav">
-    <a class="logo" href="/"><img src="/mark.svg" width="36" height="36" alt=""> tally</a>
-    <nav>
-      <a href="/">Home</a><a href="/explorer">Explorer</a><a class="on" href="/wallet">Wallet</a><a href="/mine">Mine</a><a href="/docs">Docs</a><a href="/whitepaper">Whitepaper</a>
-    </nav>
-    <a class="btn solid desk" href="/wallet">Open wallet</a>
-    <button class="burger" type="button">Menu</button>
-  </header>
+  <div class="site-top">
+    <div class="netbar">
+      <div class="netbar-in">
+        <div class="netbar-left">
+          <span><i class="dot"></i>Public testnet · SHA-256</span>
+          <span>Block <b id="rail-height">…</b></span>
+          <span>Diff <b id="rail-diff">…</b></span>
+          <span>Avg <b id="rail-time">20s</b></span>
+        </div>
+        <div class="netbar-right">
+          <span>Keys never leave local storage</span>
+          <a href="https://github.com/Tally-Chain/tallychain">Tally-Chain/tallychain</a>
+          <a href="https://x.com/tallyonrobin">@tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+    <header class="nav">
+      <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/explorer">Explorer</a>
+        <a class="on" href="/wallet">Wallet</a>
+        <a href="/mine">Mine</a>
+        <a href="/docs">Docs</a>
+        <a href="/whitepaper">Whitepaper</a>
+      </nav>
+      <div class="nav-actions desk">
+        <a class="btn sm" href="https://x.com/tallyonrobin" target="_blank" rel="noopener">X · @tallyonrobin</a>
+        <a class="btn sm" href="https://github.com/Tally-Chain/tallychain" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <button class="burger" type="button">Menu</button>
+    </header>
+  </div>
+
   <main class="wrap page">
     <div class="pagehead">
-      <div><p class="cap">Keys stay in this browser</p><h1>Wallet</h1></div>
+      <div>
+        <p class="cap">ed25519 browser signer · non-custodial</p>
+        <h1>Wallet</h1>
+      </div>
+      <p class="muted" style="margin:0">tTALLY is the testnet coin and has no market value.</p>
     </div>
+
     <section id="locked">
-      <div class="panel">
-        <h2 style="font-size:36px">Make a key, or bring one back.</h2>
-        <p class="sub">The seed is 64 hex characters. It is the only way to restore this wallet. The node never receives it.</p>
-        <button class="btn solid" id="create" type="button">Create wallet</button>
-        <label for="seed-in">Restore from a seed</label>
-        <div class="row">
-          <input id="seed-in" placeholder="64 hex characters" autocomplete="off" style="flex:1">
-          <button class="btn" id="restore" type="button">Restore</button>
+      <div class="split2">
+        <div class="panel">
+          <div class="panel-head"><p class="cap">New keypair</p></div>
+          <h2 style="font-size:30px">Generate a fresh 32-byte seed.</h2>
+          <p class="sub">Created in this browser via WebCrypto CSPRNG. The node never receives your seed and cannot recover it if cleared.</p>
+          <button class="btn solid" id="create" type="button">Create wallet</button>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><p class="cap">Existing keypair</p></div>
+          <h2 style="font-size:30px">Restore from hex seed.</h2>
+          <label for="seed-in">64 hexadecimal characters</label>
+          <div class="row" style="flex-wrap:nowrap">
+            <input id="seed-in" placeholder="e.g. 4f8a… (64 hex chars)" autocomplete="off" spellcheck="false" style="flex:1">
+            <button class="btn" id="restore" type="button">Restore</button>
+          </div>
         </div>
       </div>
     </section>
+
     <section id="open" hidden>
-      <div class="panel">
-        <p class="cap">Spendable</p>
-        <h2 id="bal" style="font-size:64px;margin:0">0</h2>
-        <p class="muted" id="maturing"></p>
-        <p class="cap" style="margin-top:18px">Address</p>
-        <p class="seed" id="addr"></p>
-        <div class="row" style="margin-top:12px">
-          <button class="btn solid" id="faucet" type="button">Drip 25 tTALLY</button>
-          <button class="btn" id="copy-addr" type="button">Copy address</button>
-          <button class="btn" id="show-seed" type="button">Show seed</button>
-          <button class="btn" id="forget" type="button">Forget this browser</button>
+      <div class="split-wallet">
+        <div class="panel">
+          <div class="panel-head">
+            <p class="cap">Account balance</p>
+            <span class="aux" id="nonce-tag">nonce 0</span>
+          </div>
+          <div class="bal-num"><span id="bal">0</span><small>tTALLY</small></div>
+          <p class="muted" id="maturing" style="margin:4px 0 18px">0 tTALLY maturing</p>
+
+          <label>Public address <span>ed25519 + checksum</span></label>
+          <p class="seed" id="addr"></p>
+
+          <div class="row" style="margin-top:14px">
+            <button class="btn solid" id="faucet" type="button">Drip 25 tTALLY</button>
+            <button class="btn" id="copy-addr" type="button">Copy address</button>
+            <button class="btn" id="show-seed" type="button">Reveal seed</button>
+            <button class="btn" id="forget" type="button">Forget key</button>
+          </div>
+          <div id="seed-wrap" hidden style="margin-top:14px">
+            <label>Secret seed — back this up offline</label>
+            <p class="seed" id="seed-box"></p>
+          </div>
         </div>
-        <p class="seed" id="seed-box" hidden></p>
+
+        <div class="panel">
+          <div class="panel-head">
+            <p class="cap">Cut a signed receipt</p>
+            <span class="aux">fee 0.01 tTALLY</span>
+          </div>
+          <form id="send">
+            <label for="to">Payee address</label>
+            <input id="to" placeholder="tally1…" spellcheck="false" required>
+
+            <label for="amount">Amount they receive <span>tTALLY</span></label>
+            <input id="amount" inputmode="decimal" placeholder="1.25" required>
+
+            <label for="memo">What it was for <span id="byte-count">0 / 140 bytes</span></label>
+            <input id="memo" maxlength="140" placeholder="for the field report" required>
+
+            <div class="preview-notch">
+              <span>Live SHA-256 notch of the words above</span>
+              <code id="live-notch">—</code>
+            </div>
+
+            <label for="ref">
+              Optional work mark (SHA-256 of file)
+              <button class="btn sm" id="pick-file" type="button">Hash local file…</button>
+            </label>
+            <input id="file-in" type="file" hidden>
+            <input id="ref" placeholder="64 hex characters, or leave empty" spellcheck="false">
+
+            <div class="row" style="margin-top:16px;justify-content:space-between">
+              <span class="muted">Signed locally as <code>tally.tx.v1</code></span>
+              <button class="btn solid" type="submit">Sign &amp; broadcast receipt</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="panel">
-        <h2 style="font-size:36px">Cut a receipt</h2>
-        <form id="send">
-          <label for="to">Payee</label>
-          <input id="to" placeholder="tally1…" required>
-          <label for="amount">Amount they receive</label>
-          <input id="amount" inputmode="decimal" placeholder="1.5" required>
-          <label for="memo">What it was for</label>
-          <input id="memo" maxlength="140" placeholder="for the field report" required>
-          <label for="ref">Mark, optional hash of the work</label>
-          <input id="ref" placeholder="64 hex characters, or leave empty" spellcheck="false">
-          <p class="muted">Fee 0.01 tTALLY, paid to the miner. The notch is the hash of the words above.</p>
-          <button class="btn solid" type="submit">Sign and send</button>
-        </form>
-      </div>
-      <div class="panel">
-        <p class="cap">Receipts</p>
+
+      <div class="panel" style="margin-top:18px">
+        <div class="panel-head">
+          <p class="cap">Receipt history</p>
+          <a class="aux" id="exp-acct" href="/explorer">View account in explorer →</a>
+        </div>
         <div class="list" id="list"></div>
       </div>
     </section>
   </main>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <div>
+        <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+        <p class="fine"><a href="https://tallychain.org">tallychain.org</a> · local file hashing and ed25519 signing run strictly in your browser.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <p class="col-h">Network</p>
+          <a href="/explorer">Explorer</a>
+          <a href="/wallet">Wallet</a>
+          <a href="/mine">Mine</a>
+        </div>
+        <div>
+          <p class="col-h">Specification</p>
+          <a href="/docs">Docs &amp; CLI</a>
+          <a href="/docs#api">JSON API</a>
+          <a href="/whitepaper">Whitepaper</a>
+        </div>
+        <div>
+          <p class="col-h">Source</p>
+          <a href="https://github.com/Tally-Chain/tallychain">GitHub</a>
+          <a href="https://x.com/tallyonrobin">X · @tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script src="/chrome.js"></script>
   <script type="module">
-    import { addressFromSecret, parseTally, randomSeed, seedBytes, signTx } from '/protocol.js';
-    import { $, api, short, ago, tally, toast } from '/common.js';
+    import { addressFromSecret, hashHex, parseTally, randomSeed, seedBytes, signTx, utf8 } from '/protocol.js';
+    import { $, ago, api, esc, formatTally, notchOf, short, tally, toast } from '/common.js';
+
     const KEY = 'tally.seed';
     let seed = localStorage.getItem(KEY) || '';
     let account = null;
@@ -89,25 +193,55 @@
       $('open').hidden = !open;
     }
 
+    function updateMemoPreview() {
+      const words = $('memo').value;
+      const bytes = utf8(words).length;
+      $('byte-count').textContent = `${bytes} / 140 bytes`;
+      $('live-notch').textContent = words ? notchOf(words) : '—';
+    }
+    $('memo').addEventListener('input', updateMemoPreview);
+
+    $('pick-file').onclick = () => $('file-in').click();
+    $('file-in').onchange = async () => {
+      const file = $('file-in').files?.[0];
+      if (!file) return;
+      const buf = new Uint8Array(await file.arrayBuffer());
+      $('ref').value = hashHex(buf);
+      toast(`hashed ${file.name} locally`);
+    };
+
     async function refresh() {
-      account = await api('/api/account/' + address());
-      $('bal').textContent = tally(account.balance).replace(' tTALLY', '');
+      const addr = address();
+      account = await api('/api/account/' + addr);
+      $('bal').textContent = formatTally(account.balance);
       const mat = BigInt(account.maturing);
-      $('maturing').textContent = mat > 0n ? `${tally(account.maturing)} still maturing from mining` : 'tTALLY';
-      $('addr').textContent = address();
-      localStorage.setItem('tally.addr', address());
+      $('maturing').textContent = mat > 0n
+        ? `${tally(account.maturing)} maturing from block rewards (unlocks after 3 blocks)`
+        : 'Spendable immediately · 0 maturing';
+      $('nonce-tag').textContent = `nonce ${account.nonce}`;
+      $('addr').textContent = addr;
+      $('exp-acct').href = `/explorer#/a/${encodeURIComponent(addr)}`;
+      localStorage.setItem('tally.addr', addr);
+
       const wait = account.lastFaucet ? Math.max(0, account.lastFaucet + 3600000 - Date.now()) : 0;
       $('faucet').disabled = wait > 0;
-      $('faucet').textContent = wait > 0 ? `Faucet in ${Math.ceil(wait / 60000)}m` : 'Drip 25 tTALLY';
-      $('list').innerHTML = account.receipts.map((tx) => {
-        const incoming = tx.type === 'faucet' || tx.from !== address();
-        return `<a href="/explorer#/tx/${tx.id}"><span>${incoming ? 'received' : 'paid'}</span><span>${tx.memo}</span><span>${incoming ? '+' : '−'}${tally(tx.amount)} · ${ago(tx.time)}</span></a>`;
-      }).join('') || '<p class="muted">No receipts yet. Take a drip, then pay someone.</p>';
+      $('faucet').textContent = wait > 0 ? `Faucet ready in ${Math.ceil(wait / 60000)}m` : 'Drip 25 tTALLY';
+
+      $('list').innerHTML = account.receipts.length
+        ? `<div class="list-head"><span>Direction</span><span>Memo &amp; counterparty</span><span>Amount · Age</span></div>` +
+          account.receipts.map((tx) => {
+            const isFaucet = tx.type === 'faucet';
+            const incoming = isFaucet || tx.from !== addr;
+            const peer = isFaucet ? 'protocol faucet' : short(incoming ? tx.from : tx.to, 9);
+            const label = isFaucet ? 'faucet' : (incoming ? 'received' : 'paid');
+            return `<a href="/explorer#/tx/${tx.id}"><span class="pill ${incoming ? 'in' : 'out'}">${label}</span><span class="memo-cell">${esc(tx.memo)} <span class="muted">· ${esc(peer)}</span></span><span>${incoming ? '+' : '−'}${esc(tally(tx.amount))} · ${ago(tx.time)}</span></a>`;
+          }).join('')
+        : '<p class="muted">No receipts yet. Drip 25 tTALLY from the faucet, then cut a signed receipt.</p>';
     }
 
     async function publish(tx) {
       await api('/api/tx', { tx });
-      toast('receipt is in the mempool');
+      toast('broadcast to mempool — awaiting next block');
       await refresh();
     }
 
@@ -115,28 +249,38 @@
       seed = randomSeed();
       localStorage.setItem(KEY, seed);
       show(true);
-      $('seed-box').hidden = false;
+      $('seed-wrap').hidden = false;
       $('seed-box').textContent = seed;
-      toast('write the seed down');
+      toast('wallet created — save your 64-hex seed');
       refresh().catch((error) => toast(error.message, true));
     };
+
     $('restore').onclick = () => {
       try {
-        seedBytes($('seed-in').value.trim());
-        seed = $('seed-in').value.trim().toLowerCase();
+        const clean = $('seed-in').value.trim().toLowerCase();
+        seedBytes(clean);
+        seed = clean;
         localStorage.setItem(KEY, seed);
         show(true);
         refresh().catch((error) => toast(error.message, true));
-      } catch (error) { toast(error.message, true); }
+      } catch (error) {
+        toast(error.message, true);
+      }
     };
+
     $('copy-addr').onclick = () => navigator.clipboard.writeText(address()).then(() => toast('address copied'));
-    $('show-seed').onclick = () => { $('seed-box').hidden = false; $('seed-box').textContent = seed; };
+    $('show-seed').onclick = () => {
+      $('seed-wrap').hidden = !$('seed-wrap').hidden;
+      $('seed-box').textContent = seed;
+    };
     $('forget').onclick = () => {
-      if (!confirm('Forget the seed in this browser? You cannot get it back from the node.')) return;
+      if (!confirm('Remove this seed from browser storage? Make sure you backed up the 64 hex characters first.')) return;
       localStorage.removeItem(KEY);
       seed = '';
+      $('seed-wrap').hidden = true;
       show(false);
     };
+
     $('faucet').onclick = async () => {
       try {
         $('faucet').disabled = true;
@@ -145,8 +289,12 @@
           nonce: account.nonce, memo: 'faucet', ref: '',
         }, secret());
         await publish(tx);
-      } catch (error) { toast(error.message, true); refresh(); }
+      } catch (error) {
+        toast(error.message, true);
+        refresh().catch(() => {});
+      }
     };
+
     $('send').onsubmit = async (event) => {
       event.preventDefault();
       try {
@@ -162,12 +310,21 @@
         }, secret());
         await publish(tx);
         $('send').reset();
-      } catch (error) { toast(error.message, true); }
+        updateMemoPreview();
+      } catch (error) {
+        toast(error.message, true);
+      }
     };
 
     if (seed) {
-      try { address(); show(true); refresh().catch((error) => toast(error.message, true)); }
-      catch { localStorage.removeItem(KEY); seed = ''; }
+      try {
+        address();
+        show(true);
+        refresh().catch((error) => toast(error.message, true));
+      } catch {
+        localStorage.removeItem(KEY);
+        seed = '';
+      }
     }
     setInterval(() => { if (seed) refresh().catch(() => {}); }, 5000);
   </script>

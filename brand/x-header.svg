@@ -1,17 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1500" height="500" viewBox="0 0 1500 500">
-  <rect width="1500" height="500" fill="#12100e"/>
-  <radialGradient id="glow" cx="22%" cy="0%" r="60%">
-    <stop offset="0%" stop-color="#ee8b3a" stop-opacity="0.28"/>
-    <stop offset="70%" stop-color="#ee8b3a" stop-opacity="0"/>
-  </radialGradient>
-  <rect width="1500" height="500" fill="url(#glow)"/>
-  <g transform="translate(250 90) scale(10)">
-    <rect width="32" height="32" rx="8" fill="#1c1915"/>
-    <rect x="6.4" y="6.6" width="19.2" height="4.8" fill="#f6f0e6"/>
-    <rect x="13.6" y="6.6" width="4.8" height="18.8" fill="#f6f0e6"/>
-    <path d="M5.6 11.5h20.8l-2.2 2.8H7.8z" fill="#ee8b3a"/>
+  <rect width="1500" height="500" fill="#100e0c"/>
+  <line x1="0" y1="76" x2="1500" y2="76" stroke="#f3ece0" stroke-opacity=".12"/>
+  <line x1="0" y1="436" x2="1500" y2="436" stroke="#f3ece0" stroke-opacity=".12"/>
+  <line x1="620" y1="76" x2="620" y2="436" stroke="#f3ece0" stroke-opacity=".12"/>
+  <text x="1410" y="50" text-anchor="end" font-family="Consolas, monospace" font-size="17" letter-spacing="3" fill="#7b7166">TALLYCHAIN.ORG · TALLY.TX.V1</text>
+  <g transform="translate(278 124) scale(4)">
+    <rect width="64" height="64" rx="10" fill="#15120f"/>
+    <rect x="1.25" y="1.25" width="61.5" height="61.5" rx="8.75" fill="none" stroke="#f3ece0" stroke-opacity=".18"/>
+    <path d="M10 13H30.5V29.5L34.5 33.5L30.5 37.5V51H24V24.5H10Z" fill="#f3ece0"/>
+    <path d="M33.5 13H54V24.5H40V51H33.5V37.5L37.5 33.5L33.5 29.5Z" fill="#e58333"/>
   </g>
-  <text x="1320" y="210" text-anchor="end" font-family="Georgia, serif" font-size="84" fill="#f6f0e6">Both halves</text>
-  <text x="1320" y="304" text-anchor="end" font-family="Georgia, serif" font-style="italic" font-size="84" fill="#ffd8b4">match.</text>
-  <text x="1320" y="368" text-anchor="end" font-family="Consolas, monospace" font-size="22" letter-spacing="5" fill="#b7ab9c">A RECEIPT CHAIN</text>
+  <text x="1410" y="214" text-anchor="end" font-family="Georgia, Times New Roman, serif" font-size="86" fill="#f3ece0" letter-spacing="-1.5">Both halves</text>
+  <text x="1410" y="308" text-anchor="end" font-family="Georgia, Times New Roman, serif" font-style="italic" font-size="86" fill="#f0c399">match.</text>
+  <text x="1410" y="378" text-anchor="end" font-family="Consolas, monospace" font-size="20" letter-spacing="4" fill="#b4a898">PROOF-OF-WORK RECEIPT LEDGER</text>
 </svg>

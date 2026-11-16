@@ -3,61 +3,168 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Docs · Tally</title>
+  <title>Docs · Tally Chain</title>
   <link rel="canonical" href="https://tallychain.org/docs">
   <link rel="icon" href="/favicon.svg">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,480..560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <header class="nav">
-    <a class="logo" href="/"><img src="/mark.svg" width="36" height="36" alt=""> tally</a>
-    <nav>
-      <a href="/">Home</a><a href="/explorer">Explorer</a><a href="/wallet">Wallet</a><a href="/mine">Mine</a><a class="on" href="/docs">Docs</a><a href="/whitepaper">Whitepaper</a>
-    </nav>
-    <a class="btn solid desk" href="/wallet">Open wallet</a>
-    <button class="burger" type="button">Menu</button>
-  </header>
-  <main class="wrap page prose">
-    <p class="cap">How the testnet works</p>
-    <h1>Docs</h1>
-    <p>Tally is a public proof-of-work chain. A payment is a receipt: who paid, who was paid, the amount, the words, and an optional mark. Both sides read those bytes from the block. This page is the rule the wallet and the node share.</p>
+  <div class="site-top">
+    <div class="netbar">
+      <div class="netbar-in">
+        <div class="netbar-left">
+          <span><i class="dot"></i>Public testnet · SHA-256</span>
+          <span>Block <b id="rail-height">…</b></span>
+          <span>Diff <b id="rail-diff">…</b></span>
+          <span>Avg <b id="rail-time">20s</b></span>
+        </div>
+        <div class="netbar-right">
+          <span>Protocol reference · v0.1</span>
+          <a href="https://github.com/Tally-Chain/tallychain">Tally-Chain/tallychain</a>
+          <a href="https://x.com/tallyonrobin">@tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+    <header class="nav">
+      <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+      <nav>
+        <a href="/">Home</a>
+        <a href="/explorer">Explorer</a>
+        <a href="/wallet">Wallet</a>
+        <a href="/mine">Mine</a>
+        <a class="on" href="/docs">Docs</a>
+        <a href="/whitepaper">Whitepaper</a>
+      </nav>
+      <div class="nav-actions desk">
+        <a class="btn sm" href="https://x.com/tallyonrobin" target="_blank" rel="noopener">X · @tallyonrobin</a>
+        <a class="btn sm" href="https://github.com/Tally-Chain/tallychain" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn solid sm" href="/wallet">Open wallet</a>
+      </div>
+      <button class="burger" type="button">Menu</button>
+    </header>
+  </div>
 
-    <h2>Addresses</h2>
-    <p>A wallet is one 32-byte seed. The seed is an ed25519 secret. The address is <code>tally1</code> plus the base58 of the public key and a 4-byte checksum. Keys are made in the browser.</p>
+  <main class="wrap page">
+    <div class="pagehead">
+      <div>
+        <p class="cap">Technical specification &amp; operator guide</p>
+        <h1>Documentation</h1>
+      </div>
+      <a class="btn sm" href="https://github.com/Tally-Chain/tallychain/blob/main/client/protocol.js">client/protocol.js →</a>
+    </div>
 
-    <h2>A receipt</h2>
-    <p>A pay transaction carries the payer, the payee, the amount, a fee, a nonce, the words, and an optional mark. The words are one line, 1 to 140 bytes. The mark, if present, is 64 hex characters: the hash of a file or a post that stays off the chain. The notch is SHA-256 of the words. The signature covers the canonical lines, so a changed word, amount, or mark will not verify.</p>
-    <p>The minimum fee is 0.01 tTALLY. 1 tTALLY is 1,000,000 notches. The fee goes to the miner of the block.</p>
+    <div class="doc-grid">
+      <aside class="toc">
+        <p class="cap">Contents</p>
+        <a href="#constants">1. Constants</a>
+        <a href="#addresses">2. Keys &amp; addresses</a>
+        <a href="#receipts">3. Canonical receipt</a>
+        <a href="#consensus">4. PoW &amp; faucet</a>
+        <a href="#cli-mine">5. CLI mining</a>
+        <a href="#api">6. HTTP JSON API</a>
+        <a href="#self-host">7. Run a local node</a>
+      </aside>
 
-    <h2>Faucet</h2>
-    <p>Once an hour an address may sign a faucet receipt for 25 tTALLY. The chain mints those coins. The memo is the word <code>faucet</code>. tTALLY has no market value.</p>
+      <div class="prose">
+        <p>Tally is a proof-of-work receipt ledger. Every payment signs who paid, who was paid, the amount, a single-line memo, and an optional 32-byte off-chain work mark. Both browser clients and Node.js processes execute the exact same verification rules in <code>client/protocol.js</code>.</p>
 
-    <h2>Mining</h2>
-    <p>The header is hashed with SHA-256. A block is valid when the hash is below <code>2^256 / difficulty</code>. Difficulty retargets every block toward 20 seconds, and it cannot move by more than 4× in one step. The reward is 8 tTALLY plus the fees in that block. It can be spent after 3 further blocks. The public node mines slowly so other miners can win.</p>
-    <p>SHA-256 is the testnet hash because the same function runs in the browser and on the node. A memory-hard hash is a later choice if specialized hardware crowds browsers out. The receipt rules do not depend on it.</p>
+        <h2 id="constants">1. Protocol constants</h2>
+        <table class="spec-table">
+          <thead>
+            <tr><th>Parameter</th><th>Value</th><th>Rule</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>UNIT</td><td>1,000,000 notches</td><td>1 tTALLY (6 decimal places)</td></tr>
+            <tr><td>MIN_FEE</td><td>10,000 notches</td><td>0.01 tTALLY minimum miner fee</td></tr>
+            <tr><td>MEMO_MAX</td><td>140 UTF-8 bytes</td><td>Required, single line (CR/LF rejected)</td></tr>
+            <tr><td>BLOCK_REWARD</td><td>8 tTALLY + fees</td><td>Unlocks after MATURITY (3 blocks)</td></tr>
+            <tr><td>FAUCET_DRIP</td><td>25 tTALLY</td><td>Once per 60 minutes per address, fee 0</td></tr>
+            <tr><td>TARGET_MS</td><td>20,000 ms</td><td>Per-block retarget, clamped 0.25×–4×</td></tr>
+          </tbody>
+        </table>
 
-    <h2 id="api">API</h2>
-    <pre>GET  /api/stats
-GET  /api/blocks?limit=12&before=N
-GET  /api/block/:height|:hash
-GET  /api/receipts?limit=12
-GET  /api/tx/:id
-GET  /api/account/:address
-GET  /api/search?q=
-GET  /api/work?address=tally1…
-POST /api/work   { id, nonce }
-POST /api/tx     { tx }</pre>
+        <h2 id="addresses">2. Keys &amp; addresses</h2>
+        <p>A wallet secret is 32 random bytes represented as 64 lowercase hex characters. From that seed, Tally derives an <strong>ed25519</strong> public key (32 bytes), appends a 4-byte double-<code>SHA-256</code> checksum, encodes the 36 bytes in Base58, and prepends <code>tally1</code>.</p>
 
-    <h2>Run a node</h2>
-    <pre>cd tally
+        <h2 id="receipts">3. Canonical receipt format</h2>
+        <p>Signatures cover nine newline-separated UTF-8 lines with no JSON whitespace ambiguity:</p>
+        <pre><code>tally.tx.v1
+&lt;type: pay | faucet | coinbase&gt;
+&lt;from: tally1… | coinbase&gt;
+&lt;to: tally1…&gt;
+&lt;amount in integer notches&gt;
+&lt;fee in integer notches&gt;
+&lt;nonce: integer &gt;= 0&gt;
+&lt;memo: 1..140 UTF-8 bytes, no \r or \n&gt;
+&lt;ref: 64 lowercase hex chars or empty&gt;</code></pre>
+        <p>The <strong>notch</strong> is <code>SHA-256(utf8(memo))</code>. The transaction ID is <code>SHA-256(canon + "\n" + sig)</code>. When any user opens a receipt in the explorer, the browser recomputes the notch from the memo and verifies the ed25519 signature against the public key decoded from <code>from</code>.</p>
+
+        <h2 id="consensus">4. Proof of work &amp; faucet</h2>
+        <p>Block headers serialize as <code>tally.block.v1</code> over height, previous hash, timestamp, difficulty, miner address, transaction Merkle list hash (<code>txRoot</code>), and a 32-bit unsigned nonce. A block is valid when <code>SHA-256(header) &lt; 2^256 / difficulty</code>. At most one transaction per sender address is included per block.</p>
+        <p>Testnet coins enter circulation only through mined coinbase rewards and signed <code>faucet</code> receipts (where <code>from === to</code>, memo is <code>faucet</code>, and 60 minutes have passed since the account’s previous drip). There is no premine or admin mint key.</p>
+
+        <h2 id="cli-mine">5. Mine against the public network</h2>
+        <p>The CLI miner defaults directly to <code>https://tallychain.org</code>—you do not need to run a local server to mine public blocks:</p>
+        <pre><code>git clone https://github.com/Tally-Chain/tallychain.git
+cd tallychain
 npm install
-npm start          # http://localhost:8344</pre>
-    <p>Environment: <code>PORT</code>, <code>DATA_PATH</code>, <code>NODE_PAUSE</code> (milliseconds the public node waits between hash batches), <code>MINER_SEED</code> (64 hex, optional).</p>
+node miner/miner.js tally1YourAddressHere</code></pre>
 
-    <h3>Mine from the command line</h3>
-    <pre>node miner/miner.js YOUR_TALLY1_ADDRESS --node http://localhost:8344</pre>
+        <h2 id="api">6. HTTP JSON API</h2>
+        <pre><code>GET  https://tallychain.org/api/stats
+GET  https://tallychain.org/api/blocks?limit=12&amp;before=HEIGHT
+GET  https://tallychain.org/api/block/:heightOrHash
+GET  https://tallychain.org/api/receipts?limit=12
+GET  https://tallychain.org/api/tx/:id
+GET  https://tallychain.org/api/account/:address
+GET  https://tallychain.org/api/search?q=QUERY
+GET  https://tallychain.org/api/work?address=tally1…
+POST https://tallychain.org/api/work   { "id": "…", "nonce": 12345 }
+POST https://tallychain.org/api/tx     { "tx": { …signed tally.tx.v1… } }</code></pre>
+
+        <h2 id="self-host">7. Run an independent local node</h2>
+        <p>One Node.js process serves the chain state, JSON API, wallet, and explorer on your own machine:</p>
+        <pre><code>npm test
+npm start          # http://localhost:8344
+
+# Point the CLI miner at your local node instead of tallychain.org:
+node miner/miner.js tally1YourAddressHere --node http://localhost:8344</code></pre>
+        <p>Optional environment variables: <code>PORT</code> (default <code>8344</code>), <code>DATA_PATH</code> (default <code>data/chain.json</code>), <code>NODE_PAUSE</code> (ms pause every 500 hashes on the built-in background miner), and <code>MINER_SEED</code> (64-hex secret for node rewards).</p>
+      </div>
+    </div>
   </main>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <div>
+        <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+        <p class="fine"><a href="https://tallychain.org">tallychain.org</a> · BSD-3-Clause open source.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <p class="col-h">Network</p>
+          <a href="/explorer">Explorer</a>
+          <a href="/wallet">Wallet</a>
+          <a href="/mine">Mine</a>
+        </div>
+        <div>
+          <p class="col-h">Specification</p>
+          <a href="/docs">Docs &amp; CLI</a>
+          <a href="/docs#api">JSON API</a>
+          <a href="/whitepaper">Whitepaper</a>
+        </div>
+        <div>
+          <p class="col-h">Source</p>
+          <a href="https://github.com/Tally-Chain/tallychain">GitHub</a>
+          <a href="https://x.com/tallyonrobin">X · @tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script src="/chrome.js"></script>
 </body>
 </html>

@@ -3,105 +3,310 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Explorer · Tally</title>
+  <title>Explorer · Tally Chain</title>
   <link rel="canonical" href="https://tallychain.org/explorer">
   <link rel="icon" href="/favicon.svg">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,480..560&family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap">
   <link rel="stylesheet" href="/style.css">
   <script type="importmap">
   { "imports": { "@noble/hashes/": "/vendor/hashes/", "@noble/curves/": "/vendor/curves/" } }
   </script>
 </head>
 <body>
-  <header class="nav">
-    <a class="logo" href="/"><img src="/mark.svg" width="36" height="36" alt=""> tally</a>
-    <nav>
-      <a href="/">Home</a><a class="on" href="/explorer">Explorer</a><a href="/wallet">Wallet</a><a href="/mine">Mine</a><a href="/docs">Docs</a><a href="/whitepaper">Whitepaper</a>
-    </nav>
-    <a class="btn solid desk" href="/wallet">Open wallet</a>
-    <button class="burger" type="button">Menu</button>
-  </header>
+  <div class="site-top">
+    <div class="netbar">
+      <div class="netbar-in">
+        <div class="netbar-left">
+          <span><i class="dot"></i>Public testnet · SHA-256</span>
+          <span>Block <b id="rail-height">…</b></span>
+          <span>Diff <b id="rail-diff">…</b></span>
+          <span>Avg <b id="rail-time">20s</b></span>
+        </div>
+        <div class="netbar-right">
+          <span>Independent client-side verification</span>
+          <a href="https://github.com/Tally-Chain/tallychain">Tally-Chain/tallychain</a>
+          <a href="https://x.com/tallyonrobin">@tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+    <header class="nav">
+      <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+      <nav>
+        <a href="/">Home</a>
+        <a class="on" href="/explorer">Explorer</a>
+        <a href="/wallet">Wallet</a>
+        <a href="/mine">Mine</a>
+        <a href="/docs">Docs</a>
+        <a href="/whitepaper">Whitepaper</a>
+      </nav>
+      <div class="nav-actions desk">
+        <a class="btn sm" href="https://x.com/tallyonrobin" target="_blank" rel="noopener">X · @tallyonrobin</a>
+        <a class="btn sm" href="https://github.com/Tally-Chain/tallychain" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn solid sm" href="/wallet">Open wallet</a>
+      </div>
+      <button class="burger" type="button">Menu</button>
+    </header>
+  </div>
+
   <main class="wrap page">
     <div class="pagehead">
-      <div><p class="cap">Every receipt is public</p><h1>Explorer</h1></div>
+      <div>
+        <p class="cap">Public PoW ledger · client-verified</p>
+        <h1>Explorer</h1>
+      </div>
+      <div class="row" id="crumb" hidden>
+        <a class="btn sm" href="#/">← Back to ledger overview</a>
+      </div>
     </div>
-    <form class="row" id="search">
-      <input id="q" placeholder="block height, block hash, receipt id, or tally1 address" style="flex:1">
-      <button class="btn solid" type="submit">Search</button>
+
+    <form class="row" id="search" style="flex-wrap:nowrap">
+      <input id="q" placeholder="Search block height, block hash, receipt id, or tally1 address…" spellcheck="false" style="flex:1">
+      <button class="btn solid" type="submit">Lookup</button>
     </form>
-    <div id="view" style="margin-top:18px"></div>
+
+    <div id="view" style="margin-top:20px"></div>
   </main>
+
+  <footer class="foot">
+    <div class="foot-in">
+      <div>
+        <a class="logo" href="/"><img src="/mark.svg" width="30" height="30" alt=""> tally</a>
+        <p class="fine"><a href="https://tallychain.org">tallychain.org</a> · every receipt is verified locally in your browser using SHA-256 and ed25519.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <p class="col-h">Network</p>
+          <a href="/explorer">Explorer</a>
+          <a href="/wallet">Wallet</a>
+          <a href="/mine">Mine</a>
+        </div>
+        <div>
+          <p class="col-h">Specification</p>
+          <a href="/docs">Docs &amp; CLI</a>
+          <a href="/docs#api">JSON API</a>
+          <a href="/whitepaper">Whitepaper</a>
+        </div>
+        <div>
+          <p class="col-h">Source</p>
+          <a href="https://github.com/Tally-Chain/tallychain">GitHub</a>
+          <a href="https://x.com/tallyonrobin">X · @tallyonrobin</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
   <script src="/chrome.js"></script>
   <script type="module">
-    import { $, api, ago, localNotch, notchOf, short, tally, toast } from '/common.js';
+    import { $, TALLY_SEAM_SVG, ago, api, canonTx, esc, formatTally, localNotch, notchOf, short, tally, toast } from '/common.js';
 
     function home(stats, blocks, receipts) {
+      const whole = (BigInt(stats.supply) / 1000000n).toString();
       return `
-        <div class="statgrid">
+        <div class="statgrid six">
           <div><span>Height</span><b>${stats.height.toLocaleString('en-US')}</b></div>
-          <div><span>Receipts</span><b>${stats.receipts.toLocaleString('en-US')}</b></div>
+          <div><span>Pay receipts</span><b>${stats.receipts.toLocaleString('en-US')}</b></div>
+          <div><span>Faucet drips</span><b>${stats.drips.toLocaleString('en-US')}</b></div>
           <div><span>Difficulty</span><b>${Number(stats.difficulty).toLocaleString('en-US')}</b></div>
-          <div><span>Block time</span><b>${stats.blockTime}s</b></div>
+          <div><span>Avg block</span><b>${stats.blockTime}s</b></div>
+          <div><span>Supply</span><b>${Number(whole).toLocaleString('en-US')}</b></div>
         </div>
-        <div class="split2" style="margin-top:14px">
-          <div class="panel"><p class="cap">Latest blocks</p><div class="list">${blocks.map((b) => `<a href="#/block/${b.height}"><span>#${b.height}</span><span>${short(b.hash, 10)}</span><span>${b.txs} tx · ${ago(b.time)}</span></a>`).join('') || '<p class="muted">Waiting for the first block.</p>'}</div></div>
-          <div class="panel"><p class="cap">Receipts</p><div class="list">${receipts.map((tx) => `<a href="#/tx/${tx.id}"><span>${tx.type}</span><span>${tx.memo}</span><span>${tally(tx.amount)}</span></a>`).join('') || '<p class="muted">No receipts in a block yet.</p>'}</div></div>
+        <div class="split2" style="margin-top:18px">
+          <div class="panel">
+            <div class="panel-head">
+              <p class="cap">Latest blocks</p>
+              <span class="aux">${stats.pow} · target ${stats.targetTime}s</span>
+            </div>
+            <div class="list">
+              <div class="list-head"><span>Height</span><span>Block hash &amp; miner</span><span>Tx · Age</span></div>
+              ${blocks.map((b) => `<a href="#/block/${b.height}"><span>#${b.height}</span><span>${esc(short(b.hash, 10))} · ${esc(short(b.miner, 7))}</span><span>${b.txs} tx · ${ago(b.time)}</span></a>`).join('') || '<p class="muted">Waiting for the first block.</p>'}
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <p class="cap">Signed receipts &amp; faucet mints</p>
+              <span class="aux">${stats.mempool} in mempool</span>
+            </div>
+            <div class="list">
+              <div class="list-head"><span>Kind</span><span>Memo</span><span>Amount</span></div>
+              ${receipts.map((tx) => `<a href="#/tx/${tx.id}"><span class="pill ${tx.type === 'pay' ? 'pay' : ''}">${esc(tx.type)}</span><span class="memo-cell">${esc(tx.memo)}</span><span>${esc(tally(tx.amount))} · ${ago(tx.time)}</span></a>`).join('') || '<p class="muted">No user receipts in a block yet. Open the wallet to drip 25 tTALLY and cut one.</p>'}
+            </div>
+          </div>
         </div>`;
     }
 
     function txView(tx) {
       const ok = localNotch(tx);
-      const notch = notchOf(tx.memo);
+      const recomputed = notchOf(tx.memo);
       if (tx.type === 'coinbase') {
-        return `<div class="panel"><p class="cap">Coinbase</p><h2 style="font-size:40px">Block reward</h2><table class="kv"><tr><td>Miner</td><td><a href="#/a/${tx.to}">${tx.to}</a></td></tr><tr><td>Amount</td><td>${tally(tx.amount)}</td></tr><tr><td>Unlocks</td><td>after 3 more blocks</td></tr><tr><td>Block</td><td><a href="#/block/${tx.height}">${tx.height}</a> · ${ago(tx.time)}</td></tr></table></div>`;
+        return `
+          <div class="panel">
+            <div class="panel-head">
+              <p class="cap">Coinbase mint · Block #${esc(tx.height)}</p>
+              <span class="aux">${ago(tx.time)}</span>
+            </div>
+            <h2 style="margin-bottom:16px">${esc(tally(tx.amount))}</h2>
+            <table class="kv">
+              <tr><td>Transaction ID</td><td>${esc(tx.id)}</td></tr>
+              <tr><td>Miner</td><td><a href="#/a/${encodeURIComponent(tx.to)}">${esc(tx.to)}</a></td></tr>
+              <tr><td>Memo</td><td>${esc(tx.memo)}</td></tr>
+              <tr><td>Notch (SHA-256)</td><td>${esc(recomputed)}</td></tr>
+              <tr><td>Maturity</td><td>Spendable after 3 additional blocks (${tx.confirmations || 0} confirmations)</td></tr>
+              <tr><td>Block</td><td><a href="#/block/${tx.height}">#${tx.height}</a></td></tr>
+            </table>
+          </div>`;
       }
-      return `<div class="panel">
-        <div class="${ok ? 'match' : 'match no'}"><span>${ok ? 'Both halves match' : 'This receipt does not check out'}</span><span>${ok ? 'notch and signature checked here' : 'do not trust it'}</span></div>
-        <div class="specimen" style="margin-top:14px">
-          <div class="half"><span class="cap">Payer</span><strong style="font-size:32px">${tally(tx.amount).replace(' tTALLY','')}</strong><p>${tx.memo}</p><code>${tx.from}</code></div>
-          <div class="cut"></div>
-          <div class="half"><span class="cap">Payee</span><strong style="font-size:32px">${tally(tx.amount).replace(' tTALLY','')}</strong><p>${tx.memo}</p><code>${tx.to}</code></div>
+      const amt = formatTally(tx.amount);
+      return `
+        <div class="voucher">
+          <div class="voucher-bar">
+            <span>Receipt ${esc(short(tx.id, 12))} · ${tx.height == null ? 'unconfirmed in mempool' : `Block #${tx.height} (${tx.confirmations} conf)`}</span>
+            <span>${esc(tx.type.toUpperCase())}</span>
+          </div>
+          <div class="specimen">
+            <div class="half">
+              <div class="half-head">
+                <span class="half-role">Stock · Payer</span>
+                <span class="half-tag">nonce ${esc(tx.nonce)}</span>
+              </div>
+              <strong>${esc(amt)}<small>tTALLY</small></strong>
+              <p class="half-memo">${esc(tx.memo)}</p>
+              <div class="half-meta"><b>from</b> <a href="#/a/${encodeURIComponent(tx.from)}" style="color:var(--copper2)">${esc(tx.from)}</a></div>
+            </div>
+            <div class="cut">${TALLY_SEAM_SVG}</div>
+            <div class="half">
+              <div class="half-head">
+                <span class="half-role">Foil · Payee</span>
+                <span class="half-tag">${ago(tx.time)}</span>
+              </div>
+              <strong>${esc(amt)}<small>tTALLY</small></strong>
+              <p class="half-memo">${esc(tx.memo)}</p>
+              <div class="half-meta"><b>to</b> <a href="#/a/${encodeURIComponent(tx.to)}" style="color:var(--copper2)">${esc(tx.to)}</a></div>
+            </div>
+          </div>
+          <div class="tamper">
+            <div class="${ok ? 'match' : 'match no'}" style="margin-top:0">
+              <strong>${ok ? 'Both halves match' : 'Verification failed'}</strong>
+              <span>${ok ? 'SHA-256(memo) matches block notch & ed25519 signature verified against payer key' : 'Recomputed notch or ed25519 signature did not verify'}</span>
+            </div>
+          </div>
         </div>
-        <table class="kv">
-          <tr><td>Notch</td><td>${notch}</td></tr>
-          <tr><td>Mark</td><td>${tx.ref || '—'}</td></tr>
-          <tr><td>Fee</td><td>${tally(tx.fee)}</td></tr>
-          <tr><td>Block</td><td>${tx.height == null ? 'in mempool' : `<a href="#/block/${tx.height}">${tx.height}</a> · ${tx.confirmations} confirmations · ${ago(tx.time)}`}</td></tr>
-          <tr><td>Id</td><td>${tx.id}</td></tr>
-        </table>
-      </div>`;
+
+        <div class="split2" style="margin-top:18px">
+          <div class="panel">
+            <div class="panel-head"><p class="cap">Cryptographic proof</p></div>
+            <table class="kv">
+              <tr><td>Receipt ID</td><td>${esc(tx.id)}</td></tr>
+              <tr><td>Block</td><td>${tx.height == null ? 'Mempool (awaiting miner)' : `<a href="#/block/${tx.height}">#${tx.height}</a> · ${tx.confirmations} confirmations`}</td></tr>
+              <tr><td>Block notch</td><td>${esc(tx.notch)}</td></tr>
+              <tr><td>Browser SHA-256</td><td>${esc(recomputed)}</td></tr>
+              <tr><td>Work mark (ref)</td><td>${tx.ref ? esc(tx.ref) : '—'}</td></tr>
+              <tr><td>Miner fee</td><td>${esc(tally(tx.fee))}</td></tr>
+              <tr><td>ed25519 sig</td><td>${esc(tx.sig)}</td></tr>
+            </table>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <p class="cap">Canonical signed payload</p>
+              <span class="aux">UTF-8 bytes signed by payer</span>
+            </div>
+            <pre class="cli" style="margin:0">${esc(canonTx(tx))}</pre>
+          </div>
+        </div>`;
     }
 
     async function route() {
-      const [, type, id] = location.hash.split('/');
+      const [, type, rawId] = location.hash.split('/');
+      const id = rawId ? decodeURIComponent(rawId) : '';
+      $('crumb').hidden = !type;
       try {
-        if (type === 'tx' && id) return $('view').innerHTML = txView(await api('/api/tx/' + id));
+        if (type === 'tx' && id) {
+          $('view').innerHTML = txView(await api('/api/tx/' + encodeURIComponent(id)));
+          return;
+        }
         if (type === 'block' && id) {
-          const block = await api('/api/block/' + id);
-          $('view').innerHTML = `<div class="panel"><p class="cap">Block ${block.height}</p><table class="kv"><tr><td>Hash</td><td>${block.hash}</td></tr><tr><td>Miner</td><td><a href="#/a/${block.miner}">${short(block.miner, 12)}</a></td></tr><tr><td>Time</td><td>${new Date(block.time).toISOString()} · ${ago(block.time)}</td></tr><tr><td>Difficulty</td><td>${block.diff}</td></tr></table><div class="list">${block.transactions.map((tx) => `<a href="#/tx/${tx.id}"><span>${tx.type}</span><span>${tx.memo}</span><span>${tally(tx.amount)}</span></a>`).join('')}</div></div>`;
+          const block = await api('/api/block/' + encodeURIComponent(id));
+          const prevLink = block.height > 1 ? `<a class="btn sm" href="#/block/${block.height - 1}">← Block #${block.height - 1}</a>` : '';
+          const nextLink = `<a class="btn sm" href="#/block/${block.height + 1}">Block #${block.height + 1} →</a>`;
+          $('view').innerHTML = `
+            <div class="panel">
+              <div class="panel-head">
+                <p class="cap">Block #${block.height}</p>
+                <div class="row">${prevLink}${nextLink}</div>
+              </div>
+              <table class="kv">
+                <tr><td>Block hash</td><td>${esc(block.hash)}</td></tr>
+                <tr><td>Previous hash</td><td>${block.height > 0 ? `<a href="#/block/${block.height - 1}">${esc(block.prev)}</a>` : esc(block.prev)}</td></tr>
+                <tr><td>Tx root</td><td>${esc(block.txRoot)}</td></tr>
+                <tr><td>Miner</td><td><a href="#/a/${encodeURIComponent(block.miner)}">${esc(block.miner)}</a></td></tr>
+                <tr><td>Timestamp</td><td>${new Date(block.time).toISOString()} (${ago(block.time)})</td></tr>
+                <tr><td>Difficulty</td><td>${Number(block.diff).toLocaleString('en-US')}</td></tr>
+                <tr><td>PoW nonce</td><td>${esc(block.nonce)}</td></tr>
+              </table>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <p class="cap">Transactions in block (${block.transactions.length})</p>
+              </div>
+              <div class="list">
+                <div class="list-head"><span>Kind</span><span>Memo</span><span>Amount</span></div>
+                ${block.transactions.map((tx) => `<a href="#/tx/${tx.id}"><span class="pill ${tx.type === 'pay' ? 'pay' : ''}">${esc(tx.type)}</span><span class="memo-cell">${esc(tx.memo)}</span><span>${esc(tally(tx.amount))}</span></a>`).join('')}
+              </div>
+            </div>`;
           return;
         }
         if (type === 'a' && id) {
-          const account = await api('/api/account/' + id);
-          $('view').innerHTML = `<div class="panel"><p class="cap">Address</p><h2 style="font-size:28px;word-break:break-all">${account.address}</h2><p>${tally(account.balance)} spendable${BigInt(account.maturing) > 0n ? ` · ${tally(account.maturing)} maturing` : ''}</p><div class="list">${account.receipts.map((tx) => `<a href="#/tx/${tx.id}"><span>${tx.type}</span><span>${tx.memo}</span><span>${tally(tx.amount)}</span></a>`).join('') || '<p class="muted">No receipts yet.</p>'}</div></div>`;
+          const account = await api('/api/account/' + encodeURIComponent(id));
+          $('view').innerHTML = `
+            <div class="panel">
+              <div class="panel-head">
+                <p class="cap">Account ledger</p>
+                <span class="aux">nonce ${account.nonce}</span>
+              </div>
+              <p class="seed">${esc(account.address)}</p>
+              <div class="statgrid" style="margin-top:14px">
+                <div><span>Spendable</span><b>${esc(tally(account.balance))}</b></div>
+                <div><span>Maturing</span><b>${esc(tally(account.maturing))}</b></div>
+                <div><span>Confirmed nonce</span><b>${account.included}</b></div>
+                <div><span>Receipts</span><b>${account.receipts.length}</b></div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><p class="cap">Account receipts</p></div>
+              <div class="list">
+                <div class="list-head"><span>Kind</span><span>Memo</span><span>Amount · Age</span></div>
+                ${account.receipts.map((tx) => `<a href="#/tx/${tx.id}"><span class="pill ${tx.type === 'pay' ? 'pay' : ''}">${esc(tx.type)}</span><span class="memo-cell">${esc(tx.memo)}</span><span>${esc(tally(tx.amount))} · ${ago(tx.time)}</span></a>`).join('') || '<p class="muted">No receipts recorded for this address yet.</p>'}
+              </div>
+            </div>`;
           return;
         }
-        const [stats, blocks, receipts] = await Promise.all([api('/api/stats'), api('/api/blocks?limit=12'), api('/api/receipts?limit=12')]);
+        const [stats, blocks, receipts] = await Promise.all([
+          api('/api/stats'),
+          api('/api/blocks?limit=14'),
+          api('/api/receipts?limit=14'),
+        ]);
         $('view').innerHTML = home(stats, blocks, receipts);
       } catch (error) {
-        $('view').innerHTML = `<p class="bad">${error.message}</p>`;
+        $('view').innerHTML = `<div class="panel"><p class="bad" style="margin:0">${esc(error.message)}</p></div>`;
       }
     }
+
     $('search').onsubmit = async (event) => {
       event.preventDefault();
+      const q = $('q').value.trim();
+      if (!q) return;
       try {
-        const found = await api('/api/search?q=' + encodeURIComponent($('q').value.trim()));
+        const found = await api('/api/search?q=' + encodeURIComponent(q));
         location.hash = `#/${found.type === 'account' ? 'a' : found.type}/${found.id}`;
-      } catch (error) { toast(error.message, true); }
+      } catch (error) {
+        toast(error.message, true);
+      }
     };
+
     addEventListener('hashchange', route);
     route();
-    setInterval(() => { if (!location.hash || location.hash === '#/') route(); }, 6000);
+    setInterval(() => { if (!location.hash || location.hash === '#/') route(); }, 7000);
   </script>
 </body>
 </html>

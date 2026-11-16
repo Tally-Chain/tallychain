@@ -1,16 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
-  <rect width="1200" height="630" fill="#12100e"/>
-  <radialGradient id="glow" cx="50%" cy="0%" r="65%">
-    <stop offset="0%" stop-color="#ee8b3a" stop-opacity="0.22"/>
-    <stop offset="72%" stop-color="#ee8b3a" stop-opacity="0"/>
-  </radialGradient>
-  <rect width="1200" height="630" fill="url(#glow)"/>
-  <g transform="translate(72 195) scale(7.5)">
-    <rect width="32" height="32" rx="8" fill="#1c1915"/>
-    <rect x="6.4" y="6.6" width="19.2" height="4.8" fill="#f6f0e6"/>
-    <rect x="13.6" y="6.6" width="4.8" height="18.8" fill="#f6f0e6"/>
-    <path d="M5.6 11.5h20.8l-2.2 2.8H7.8z" fill="#ee8b3a"/>
+  <rect width="1200" height="630" fill="#100e0c"/>
+  <rect x="44" y="44" width="1112" height="542" fill="#15120f" stroke="#f3ece0" stroke-opacity=".14"/>
+  <line x1="44" y1="118" x2="1156" y2="118" stroke="#f3ece0" stroke-opacity=".12"/>
+  <line x1="364" y1="118" x2="364" y2="586" stroke="#f3ece0" stroke-opacity=".12"/>
+  <text x="76" y="90" font-family="Consolas, monospace" font-size="17" letter-spacing="3" fill="#f0c399">TALLY CHAIN · PUBLIC RECEIPT LEDGER</text>
+  <text x="1124" y="90" text-anchor="end" font-family="Consolas, monospace" font-size="17" fill="#7b7166">tallychain.org</text>
+  <g transform="translate(96 226) scale(3.4)">
+    <rect width="64" height="64" rx="10" fill="#100e0c"/>
+    <rect x="1.25" y="1.25" width="61.5" height="61.5" rx="8.75" fill="none" stroke="#f3ece0" stroke-opacity=".18"/>
+    <path d="M10 13H30.5V29.5L34.5 33.5L30.5 37.5V51H24V24.5H10Z" fill="#f3ece0"/>
+    <path d="M33.5 13H54V24.5H40V51H33.5V37.5L37.5 33.5L33.5 29.5Z" fill="#e58333"/>
   </g>
-  <text x="340" y="275" font-family="Segoe UI, Arial, sans-serif" font-weight="600" font-size="92" fill="#f6f0e6" letter-spacing="-2">tally</text>
-  <text x="340" y="360" font-family="Georgia, serif" font-style="italic" font-size="48" fill="#ffd8b4">Both halves match.</text>
+  <text x="420" y="278" font-family="Georgia, Times New Roman, serif" font-size="88" fill="#f3ece0" letter-spacing="-2">Both halves</text>
+  <text x="420" y="372" font-family="Georgia, Times New Roman, serif" font-style="italic" font-size="88" fill="#f0c399" letter-spacing="-1">match.</text>
+  <text x="420" y="452" font-family="Segoe UI, Arial, sans-serif" font-size="26" fill="#b4a898">Every payment signs the words, the amount, and the SHA-256 notch.</text>
+  <text x="420" y="528" font-family="Consolas, monospace" font-size="18" letter-spacing="2" fill="#7b7166">ED25519 · SHA-256 POW · CLIENT-VERIFIED</text>
 </svg>
